@@ -15,6 +15,7 @@ import os
 import shlex
 import signal
 import subprocess
+import sys
 import time
 import urllib.request
 
@@ -98,14 +99,97 @@ def launch_aggregated(model: str, port: int, gpu_mem_util: float, kv_dtype: str,
 # The proxy (examples/online_serving/disaggregated_serving) routes prefill->P,
 # decode->D. We keep these as builders so run.py can enable them post-spike.
 
-def disagg_engine_args(role: str, connector: str, kv_dtype: str, block_size: int,
-                       max_model_len: int) -> list[str]:
+def disagg_engine_args(role: str, connector: str, block_size: int,
+                       max_model_len: int, kv_dtype: str = "auto") -> list[str]:
     assert role in ("kv_producer", "kv_consumer")
     kv_cfg = f'{{"kv_connector":"{connector}","kv_role":"{role}"}}'
-    return [
+    args = [
         "--kv-transfer-config", kv_cfg,
-        "--kv-cache-dtype", kv_dtype,
         "--block-size", str(block_size),
         "--max-model-len", str(max_model_len),
         "--no-enable-prefix-caching",
     ]
+    if kv_dtype and kv_dtype != "auto":
+        args = ["--kv-cache-dtype", kv_dtype] + args
+    return args
+
+
+def launch_disagg_pair(model, prefill_port, decode_port, gpu_mem_util, max_model_len,
+                       connector, block_size, log_dir, kv_dtype="auto",
+                       prefill_gpu="0", decode_gpu="1",
+                       side_channel_base=5600) -> tuple["VLLMServer", "VLLMServer"]:
+    """Config C: prefill (producer) on one GPU, decode (consumer) on another.
+    Same-vendor NVIDIA disaggregation; NIXL moves KV intra-node (NVLink/PCIe P2P)."""
+    common = [f"--gpu-memory-utilization", str(gpu_mem_util)]
+    p_args = common + disagg_engine_args("kv_producer", connector, block_size, max_model_len, kv_dtype)
+    d_args = common + disagg_engine_args("kv_consumer", connector, block_size, max_model_len, kv_dtype)
+    p_env = {"CUDA_VISIBLE_DEVICES": prefill_gpu,
+             "VLLM_NIXL_SIDE_CHANNEL_PORT": str(side_channel_base)}
+    d_env = {"CUDA_VISIBLE_DEVICES": decode_gpu,
+             "VLLM_NIXL_SIDE_CHANNEL_PORT": str(side_channel_base + 1)}
+    prefill = VLLMServer(model, prefill_port, p_args, env=p_env,
+                         log_path=f"{log_dir}/C_prefill.log").start()
+    decode = VLLMServer(model, decode_port, d_args, env=d_env,
+                        log_path=f"{log_dir}/C_decode.log").start()
+    return prefill, decode
+
+
+class ProxyServer:
+    """Runs pdbench.proxy as a subprocess in front of the prefill/decode pair."""
+
+    def __init__(self, prefill_url, decode_url, port, log_path):
+        self.port = port
+        self.base_url = f"http://127.0.0.1:{port}"
+        self.log_path = log_path
+        self.proc = None
+        self._cmd = [sys.executable, "-m", "pdbench.proxy",
+                     "--prefill", prefill_url, "--decode", decode_url,
+                     "--port", str(port)]
+
+    def start(self):
+        logf = open(self.log_path, "w") if self.log_path else subprocess.DEVNULL
+        self.proc = subprocess.Popen(self._cmd, stdout=logf,
+                                     stderr=subprocess.STDOUT, env=os.environ.copy())
+        return self
+
+    def wait_ready(self, timeout=1200.0):
+        return _wait_healthy(self.base_url, timeout)
+
+    def stop(self):
+        if self.proc and self.proc.poll() is None:
+            self.proc.terminate()
+            try:
+                self.proc.wait(timeout=15)
+            except Exception:
+                self.proc.kill()
+
+
+class DisaggBundle:
+    """Config C/E bundle: prefill engine + decode engine + proxy, one interface.
+
+    Exposes .base_url (the proxy), .wait_ready(), .stop(), .scrape_metrics() so
+    run.py can treat it exactly like a single VLLMServer.
+    """
+
+    def __init__(self, prefill: VLLMServer, decode: VLLMServer, proxy: ProxyServer):
+        self.prefill, self.decode, self.proxy = prefill, decode, proxy
+        self.base_url = proxy.base_url
+
+    def wait_ready(self, timeout=1800.0):
+        if not self.prefill.wait_ready(timeout):
+            print("  prefill engine not healthy"); return False
+        if not self.decode.wait_ready(timeout):
+            print("  decode engine not healthy"); return False
+        self.proxy.start()
+        return self.proxy.wait_ready(120)
+
+    def stop(self):
+        for s in (self.proxy, self.prefill, self.decode):
+            try:
+                s.stop()
+            except Exception:
+                pass
+
+    def scrape_metrics(self) -> str:
+        return ("# ---- prefill ----\n" + self.prefill.scrape_metrics()
+                + "\n# ---- decode ----\n" + self.decode.scrape_metrics())

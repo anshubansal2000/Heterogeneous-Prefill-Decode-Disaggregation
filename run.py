@@ -101,8 +101,18 @@ def build_server(config, preset, args, log_path):
             gpu_mem_util=preset["gpu_mem_util"], kv_dtype=args.kv_dtype,
             max_model_len=args.max_model_len, extra=args.engine_args or [],
             log_path=log_path)
-    raise SystemExit(f"config {config} not yet enabled in this build "
-                     f"(A is implemented; E/C are scaffolded in pdbench/server.py)")
+    if config == "C":
+        # same-vendor NVIDIA disaggregation: prefill (GPU0, producer) + decode (GPU1, consumer)
+        log_dir = os.path.dirname(log_path) or "results"
+        prefill, decode = server.launch_disagg_pair(
+            model=preset["hf"], prefill_port=args.port + 100, decode_port=args.port + 200,
+            gpu_mem_util=preset["gpu_mem_util"], max_model_len=args.max_model_len,
+            connector=args.connector, block_size=args.block_size, log_dir=log_dir,
+            kv_dtype=args.kv_dtype, prefill_gpu=args.prefill_gpu, decode_gpu=args.decode_gpu)
+        proxy = server.ProxyServer(prefill.base_url, decode.base_url, args.port,
+                                   f"{log_dir}/C_proxy.log")
+        return server.DisaggBundle(prefill, decode, proxy)
+    raise SystemExit(f"config {config} not yet enabled (A, C implemented; E scaffolded)")
 
 
 def main():
@@ -115,6 +125,12 @@ def main():
     ap.add_argument("--port", type=int, default=8000)
     ap.add_argument("--kv-dtype", default="auto")
     ap.add_argument("--max-model-len", type=int, default=18000)
+    # Config C (disaggregation) knobs
+    ap.add_argument("--connector", default="NixlConnector",
+                    help="KV connector for disagg configs (NixlConnector, LMCacheConnectorV1, ...)")
+    ap.add_argument("--block-size", type=int, default=16)
+    ap.add_argument("--prefill-gpu", default="0")
+    ap.add_argument("--decode-gpu", default="1")
     ap.add_argument("--reps", type=int, default=3, help="requests-per-worker per cell")
     ap.add_argument("--concurrency", type=int, nargs="*", default=None)
     ap.add_argument("--isl-osl", type=str, default=None,

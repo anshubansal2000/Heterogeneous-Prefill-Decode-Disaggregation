@@ -1,5 +1,6 @@
 # pdbench harness (client side — runs anywhere)
 httpx>=0.27
+aiohttp>=3.9        # disagg proxy (pdbench/proxy.py)
 matplotlib>=3.7
 numpy
 transformers>=4.44        # vocab lookup for token-id prompts
