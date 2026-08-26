@@ -47,8 +47,7 @@ class VLLMServer:
         self.proc: subprocess.Popen | None = None
 
     def start(self) -> "VLLMServer":
-        cmd = ["vllm", "serve", self.model, "--port", str(self.port),
-               "--disable-log-requests"] + self.engine_args
+        cmd = ["vllm", "serve", self.model, "--port", str(self.port)] + self.engine_args
         logf = open(self.log_path, "w") if self.log_path else subprocess.DEVNULL
         print("  launching:", " ".join(shlex.quote(c) for c in cmd), flush=True)
         self.proc = subprocess.Popen(cmd, stdout=logf, stderr=subprocess.STDOUT,
@@ -86,10 +85,11 @@ def launch_aggregated(model: str, port: int, gpu_mem_util: float, kv_dtype: str,
                       max_model_len: int, extra: list[str], log_path: str) -> VLLMServer:
     args = [
         "--gpu-memory-utilization", str(gpu_mem_util),
-        "--kv-cache-dtype", kv_dtype,
         "--max-model-len", str(max_model_len),
         "--no-enable-prefix-caching",   # match Moreh: isolate raw compute
     ] + extra
+    if kv_dtype and kv_dtype != "auto":
+        args = ["--kv-cache-dtype", kv_dtype] + args
     return VLLMServer(model, port, args, log_path=log_path).start()
 
 

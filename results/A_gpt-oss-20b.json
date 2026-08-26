@@ -1,0 +1,869 @@
+{
+  "manifest": {
+    "config": "A",
+    "model": "openai/gpt-oss-20b",
+    "timestamp_utc": "2026-08-26T19:46:06Z",
+    "args": {
+      "config": "A",
+      "model": "gpt-oss-20b",
+      "stage": "matrix",
+      "port": 8000,
+      "kv_dtype": "auto",
+      "max_model_len": 20000,
+      "reps": 2,
+      "concurrency": null,
+      "isl_osl": null,
+      "slo_ttft": 2.0,
+      "slo_itl_ms": 50.0,
+      "engine_args": [],
+      "quick": false,
+      "no_server": false,
+      "plots_only": false,
+      "results": null
+    },
+    "vllm_version": "0.28.0",
+    "torch_version": "2.13.0+cu130",
+    "git_sha": "",
+    "platform": "Linux-6.8.0-106-generic-x86_64-with-glibc2.39",
+    "gpu": [
+      {
+        "name": "NVIDIA H100 80GB HBM3",
+        "memory": "81559 MiB",
+        "driver": "580.126.09"
+      }
+    ],
+    "cpu": {
+      "processor": "x86_64",
+      "cores_logical": 224,
+      "flags_avx512": true,
+      "flags_amx": true,
+      "mem_total": "MemTotal:       2113225920 kB"
+    },
+    "max_extent": {}
+  },
+  "results": [
+    {
+      "isl": 1024,
+      "osl": 1024,
+      "concurrency": 1,
+      "n_ok": 2,
+      "n_err": 0,
+      "wall_s": 6.848,
+      "ttft_s": {
+        "mean": 0.03209274914115667,
+        "p50": 0.03209274914115667,
+        "p95": 0.03507328936830163,
+        "p99": 0.03533822627738118
+      },
+      "tpot_ms": {
+        "mean": 3.3177904850291178,
+        "p50": 3.3177904850291178,
+        "p95": 3.3190874000118202,
+        "p99": 3.319202681343616
+      },
+      "itl_ms": {
+        "mean": 3.317790485029118,
+        "p50": 3.309330902993679,
+        "p95": 3.4221062436699867,
+        "p99": 4.057658817619084
+      },
+      "e2el_s": {
+        "mean": 3.423788871616125,
+        "p50": 3.423788871616125,
+        "p95": 3.42549939006567,
+        "p99": 3.425651436150074
+      },
+      "output_tps": 299.07,
+      "total_tps": 598.13,
+      "request_throughput_rps": 0.2921,
+      "goodput_rps": 0.2921,
+      "slo": {
+        "ttft_s": 2.0,
+        "itl_ms": 50.0
+      },
+      "errors_sample": []
+    },
+    {
+      "isl": 1024,
+      "osl": 1024,
+      "concurrency": 4,
+      "n_ok": 8,
+      "n_err": 0,
+      "wall_s": 8.5372,
+      "ttft_s": {
+        "mean": 0.3980773943476379,
+        "p50": 0.3959266822785139,
+        "p95": 0.702724265679717,
+        "p99": 0.7028079395741225
+      },
+      "tpot_ms": {
+        "mean": 3.791935110747741,
+        "p50": 3.790753929163603,
+        "p95": 3.798158063881976,
+        "p99": 3.7995455864561247
+      },
+      "itl_ms": {
+        "mean": 3.791935110747741,
+        "p50": 3.7874188274145126,
+        "p95": 3.9050109684467316,
+        "p99": 4.19825680553913
+      },
+      "e2el_s": {
+        "mean": 4.267471561674029,
+        "p50": 4.26594565063715,
+        "p95": 4.570950779970735,
+        "p99": 4.571291128527373
+      },
+      "output_tps": 959.57,
+      "total_tps": 1919.14,
+      "request_throughput_rps": 0.9371,
+      "goodput_rps": 0.9371,
+      "slo": {
+        "ttft_s": 2.0,
+        "itl_ms": 50.0
+      },
+      "errors_sample": []
+    },
+    {
+      "isl": 1024,
+      "osl": 1024,
+      "concurrency": 8,
+      "n_ok": 16,
+      "n_err": 0,
+      "wall_s": 9.5723,
+      "ttft_s": {
+        "mean": 0.7352205560309812,
+        "p50": 0.7703966200351715,
+        "p95": 0.8033896712586284,
+        "p99": 0.8042039340361953
+      },
+      "tpot_ms": {
+        "mean": 3.9676666443245927,
+        "p50": 3.946866636344786,
+        "p95": 4.1730605568006345,
+        "p99": 4.55805582578714
+      },
+      "itl_ms": {
+        "mean": 3.967710976662912,
+        "p50": 3.9068246260285378,
+        "p95": 4.108166694641113,
+        "p99": 4.819354563951473
+      },
+      "e2el_s": {
+        "mean": 4.7837261816021055,
+        "p50": 4.784083525650203,
+        "p95": 4.851317750290036,
+        "p99": 4.852030189707875
+      },
+      "output_tps": 1711.61,
+      "total_tps": 3423.22,
+      "request_throughput_rps": 1.6715,
+      "goodput_rps": 1.6715,
+      "slo": {
+        "ttft_s": 2.0,
+        "itl_ms": 50.0
+      },
+      "errors_sample": []
+    },
+    {
+      "isl": 1024,
+      "osl": 1024,
+      "concurrency": 16,
+      "n_ok": 32,
+      "n_err": 0,
+      "wall_s": 11.3877,
+      "ttft_s": {
+        "mean": 1.2491943004424684,
+        "p50": 0.25262060575187206,
+        "p95": 2.4689190361648796,
+        "p99": 2.471558110807091
+      },
+      "tpot_ms": {
+        "mean": 4.350782879708033,
+        "p50": 4.380058996145861,
+        "p95": 4.5088278557503205,
+        "p99": 5.769567626841424
+      },
+      "itl_ms": {
+        "mean": 4.350825432949918,
+        "p50": 4.19760774821043,
+        "p95": 4.659728612750769,
+        "p99": 5.404158495366573
+      },
+      "e2el_s": {
+        "mean": 5.6903577108168975,
+        "p50": 5.686751884408295,
+        "p95": 6.659099767357111,
+        "p99": 6.66129749527201
+      },
+      "output_tps": 2877.5,
+      "total_tps": 5755.0,
+      "request_throughput_rps": 2.8101,
+      "goodput_rps": 1.4928,
+      "slo": {
+        "ttft_s": 2.0,
+        "itl_ms": 50.0
+      },
+      "errors_sample": []
+    },
+    {
+      "isl": 1024,
+      "osl": 1024,
+      "concurrency": 32,
+      "n_ok": 64,
+      "n_err": 0,
+      "wall_s": 13.0447,
+      "ttft_s": {
+        "mean": 0.5682657486468088,
+        "p50": 0.4207812650129199,
+        "p95": 1.2480521532706916,
+        "p99": 1.2506719670817257
+      },
+      "tpot_ms": {
+        "mean": 5.812430889836582,
+        "p50": 5.646310168355849,
+        "p95": 6.333211143213207,
+        "p99": 6.393521492207219
+      },
+      "itl_ms": {
+        "mean": 5.812335837952966,
+        "p50": 5.5349767208099365,
+        "p95": 6.1969563364982605,
+        "p99": 7.618865966796873
+      },
+      "e2el_s": {
+        "mean": 6.50384342551115,
+        "p50": 6.506650074385107,
+        "p95": 6.96779221072793,
+        "p99": 6.968830143492669
+      },
+      "output_tps": 5023.97,
+      "total_tps": 10047.93,
+      "request_throughput_rps": 4.9062,
+      "goodput_rps": 4.9062,
+      "slo": {
+        "ttft_s": 2.0,
+        "itl_ms": 50.0
+      },
+      "errors_sample": []
+    },
+    {
+      "isl": 1024,
+      "osl": 8192,
+      "concurrency": 1,
+      "n_ok": 2,
+      "n_err": 0,
+      "wall_s": 55.1718,
+      "ttft_s": {
+        "mean": 0.034358445554971695,
+        "p50": 0.034358445554971695,
+        "p95": 0.035859376192092896,
+        "p99": 0.03599279224872589
+      },
+      "tpot_ms": {
+        "mean": 3.363850415526219,
+        "p50": 3.363850415526219,
+        "p95": 3.364169592258403,
+        "p99": 3.364197963523486
+      },
+      "itl_ms": {
+        "mean": 3.3638504155262194,
+        "p50": 3.3614542335271835,
+        "p95": 3.4546174108982086,
+        "p99": 3.5447100736200805
+      },
+      "e2el_s": {
+        "mean": 27.585590133443475,
+        "p50": 27.585590133443475,
+        "p95": 27.589942012540995,
+        "p99": 27.590328846238553
+      },
+      "output_tps": 296.96,
+      "total_tps": 334.08,
+      "request_throughput_rps": 0.0363,
+      "goodput_rps": 0.0363,
+      "slo": {
+        "ttft_s": 2.0,
+        "itl_ms": 50.0
+      },
+      "errors_sample": []
+    },
+    {
+      "isl": 1024,
+      "osl": 8192,
+      "concurrency": 4,
+      "n_ok": 8,
+      "n_err": 0,
+      "wall_s": 64.0071,
+      "ttft_s": {
+        "mean": 0.09458674886263907,
+        "p50": 0.09355694893747568,
+        "p95": 0.10170623324811459,
+        "p99": 0.101875404343009
+      },
+      "tpot_ms": {
+        "mean": 3.896273321652602,
+        "p50": 3.8961709428302043,
+        "p95": 3.8977271371644355,
+        "p99": 3.898193372523164
+      },
+      "itl_ms": {
+        "mean": 3.8962732265660276,
+        "p50": 3.8929665461182594,
+        "p95": 4.063606727868319,
+        "p99": 4.5073408633470535
+      },
+      "e2el_s": {
+        "mean": 32.00240126531571,
+        "p50": 32.00286355149001,
+        "p95": 32.0083029512316,
+        "p99": 32.00851924456656
+      },
+      "output_tps": 1023.89,
+      "total_tps": 1151.87,
+      "request_throughput_rps": 0.125,
+      "goodput_rps": 0.125,
+      "slo": {
+        "ttft_s": 2.0,
+        "itl_ms": 50.0
+      },
+      "errors_sample": []
+    },
+    {
+      "isl": 1024,
+      "osl": 8192,
+      "concurrency": 8,
+      "n_ok": 16,
+      "n_err": 0,
+      "wall_s": 67.624,
+      "ttft_s": {
+        "mean": 0.14515560492873192,
+        "p50": 0.15063171461224556,
+        "p95": 0.16270744474604726,
+        "p99": 0.1627627440728247
+      },
+      "tpot_ms": {
+        "mean": 4.111039665657793,
+        "p50": 4.111186763512112,
+        "p95": 4.117181856698016,
+        "p99": 4.121779225055018
+      },
+      "itl_ms": {
+        "mean": 4.111039869945213,
+        "p50": 4.0857866406440735,
+        "p95": 4.463955480605364,
+        "p99": 5.034376624971624
+      },
+      "e2el_s": {
+        "mean": 33.81016261840705,
+        "p50": 33.810900130309165,
+        "p95": 33.81948018679395,
+        "p99": 33.8202033427544
+      },
+      "output_tps": 1938.25,
+      "total_tps": 2180.53,
+      "request_throughput_rps": 0.2366,
+      "goodput_rps": 0.2366,
+      "slo": {
+        "ttft_s": 2.0,
+        "itl_ms": 50.0
+      },
+      "errors_sample": []
+    },
+    {
+      "isl": 1024,
+      "osl": 8192,
+      "concurrency": 16,
+      "n_ok": 32,
+      "n_err": 0,
+      "wall_s": 77.4687,
+      "ttft_s": {
+        "mean": 0.48773810995044187,
+        "p50": 0.30386881716549397,
+        "p95": 0.9383284637704492,
+        "p99": 0.9399643653444946
+      },
+      "tpot_ms": {
+        "mean": 4.671324801968695,
+        "p50": 4.6646214436294775,
+        "p95": 4.831094888942502,
+        "p99": 4.838797578124767
+      },
+      "itl_ms": {
+        "mean": 4.671346996262634,
+        "p50": 4.670008085668087,
+        "p95": 5.16110910102725,
+        "p99": 5.503661017864943
+      },
+      "e2el_s": {
+        "mean": 38.72970424348023,
+        "p50": 38.731702976860106,
+        "p95": 39.72439519809559,
+        "p99": 39.724988632071764
+      },
+      "output_tps": 3383.87,
+      "total_tps": 3806.85,
+      "request_throughput_rps": 0.4131,
+      "goodput_rps": 0.4131,
+      "slo": {
+        "ttft_s": 2.0,
+        "itl_ms": 50.0
+      },
+      "errors_sample": []
+    },
+    {
+      "isl": 1024,
+      "osl": 8192,
+      "concurrency": 32,
+      "n_ok": 64,
+      "n_err": 0,
+      "wall_s": 101.8,
+      "ttft_s": {
+        "mean": 0.4163969273795374,
+        "p50": 0.46654546353966,
+        "p95": 0.5822752089239657,
+        "p99": 0.5872668063826859
+      },
+      "tpot_ms": {
+        "mean": 6.164178706450963,
+        "p50": 6.168046688440364,
+        "p95": 6.210112380538723,
+        "p99": 6.211842415384181
+      },
+      "itl_ms": {
+        "mean": 6.164181010376596,
+        "p50": 6.135834380984306,
+        "p95": 7.314260490238666,
+        "p99": 7.835061401128772
+      },
+      "e2el_s": {
+        "mean": 50.893461029743776,
+        "p50": 50.89949604310095,
+        "p95": 51.13056502509862,
+        "p99": 51.13248169589788
+      },
+      "output_tps": 5150.18,
+      "total_tps": 5793.95,
+      "request_throughput_rps": 0.6287,
+      "goodput_rps": 0.6287,
+      "slo": {
+        "ttft_s": 2.0,
+        "itl_ms": 50.0
+      },
+      "errors_sample": []
+    },
+    {
+      "isl": 8192,
+      "osl": 1024,
+      "concurrency": 1,
+      "n_ok": 2,
+      "n_err": 0,
+      "wall_s": 6.902,
+      "ttft_s": {
+        "mean": 0.1611527195200324,
+        "p50": 0.1611527195200324,
+        "p95": 0.1617563900537789,
+        "p99": 0.1618100496567786
+      },
+      "tpot_ms": {
+        "mean": 3.23282476410682,
+        "p50": 3.23282476410682,
+        "p95": 3.234381845274383,
+        "p99": 3.2345202524892773
+      },
+      "itl_ms": {
+        "mean": 3.2328256142739873,
+        "p50": 3.2250601798295975,
+        "p95": 3.292953222990036,
+        "p99": 3.4293766692280787
+      },
+      "e2el_s": {
+        "mean": 3.450896277092397,
+        "p50": 3.450896277092397,
+        "p95": 3.4533681598491968,
+        "p99": 3.453587882760912
+      },
+      "output_tps": 296.73,
+      "total_tps": 2670.54,
+      "request_throughput_rps": 0.2898,
+      "goodput_rps": 0.2898,
+      "slo": {
+        "ttft_s": 2.0,
+        "itl_ms": 50.0
+      },
+      "errors_sample": []
+    },
+    {
+      "isl": 8192,
+      "osl": 1024,
+      "concurrency": 4,
+      "n_ok": 8,
+      "n_err": 0,
+      "wall_s": 9.8822,
+      "ttft_s": {
+        "mean": 0.42652795114554465,
+        "p50": 0.48051904514431953,
+        "p95": 0.5712871330790221,
+        "p99": 0.5763443515263498
+      },
+      "tpot_ms": {
+        "mean": 4.435267208859371,
+        "p50": 4.382532424017968,
+        "p95": 4.671141558631245,
+        "p99": 4.672442454691136
+      },
+      "itl_ms": {
+        "mean": 4.435338247095686,
+        "p50": 4.295396618545055,
+        "p95": 4.664300195872784,
+        "p99": 4.8479872569441795
+      },
+      "e2el_s": {
+        "mean": 4.93729849695228,
+        "p50": 4.934207127429545,
+        "p95": 4.960787282697856,
+        "p99": 4.961366483829916
+      },
+      "output_tps": 828.97,
+      "total_tps": 7460.69,
+      "request_throughput_rps": 0.8095,
+      "goodput_rps": 0.8095,
+      "slo": {
+        "ttft_s": 2.0,
+        "itl_ms": 50.0
+      },
+      "errors_sample": []
+    },
+    {
+      "isl": 8192,
+      "osl": 1024,
+      "concurrency": 8,
+      "n_ok": 16,
+      "n_err": 0,
+      "wall_s": 12.7761,
+      "ttft_s": {
+        "mean": 0.7244146624580026,
+        "p50": 0.7517634527757764,
+        "p95": 1.0832877992652357,
+        "p99": 1.093442444782704
+      },
+      "tpot_ms": {
+        "mean": 5.556983086475585,
+        "p50": 5.529352547948511,
+        "p95": 6.059175794980762,
+        "p99": 6.06179900352124
+      },
+      "itl_ms": {
+        "mean": 5.557108629058103,
+        "p50": 5.219973623752594,
+        "p95": 5.5790673941373825,
+        "p99": 7.158911228179936
+      },
+      "e2el_s": {
+        "mean": 6.380092826671898,
+        "p50": 6.376968012191355,
+        "p95": 6.409080985933542,
+        "p99": 6.409650432318449
+      },
+      "output_tps": 1282.4,
+      "total_tps": 11541.56,
+      "request_throughput_rps": 1.2523,
+      "goodput_rps": 1.2523,
+      "slo": {
+        "ttft_s": 2.0,
+        "itl_ms": 50.0
+      },
+      "errors_sample": []
+    },
+    {
+      "isl": 8192,
+      "osl": 1024,
+      "concurrency": 16,
+      "n_ok": 32,
+      "n_err": 0,
+      "wall_s": 16.8465,
+      "ttft_s": {
+        "mean": 1.0275516901165247,
+        "p50": 0.8859483012929559,
+        "p95": 2.051274543441832,
+        "p99": 2.143102393914014
+      },
+      "tpot_ms": {
+        "mean": 7.232072443481053,
+        "p50": 7.400976646435903,
+        "p95": 7.8476395371941985,
+        "p99": 8.031763340510114
+      },
+      "itl_ms": {
+        "mean": 7.231914752153832,
+        "p50": 6.239444017410278,
+        "p95": 6.689715385437011,
+        "p99": 8.887255340814592
+      },
+      "e2el_s": {
+        "mean": 8.403547794558108,
+        "p50": 8.38477664347738,
+        "p95": 9.604000043310226,
+        "p99": 9.766981730479747
+      },
+      "output_tps": 1945.1,
+      "total_tps": 17505.87,
+      "request_throughput_rps": 1.8995,
+      "goodput_rps": 1.7808,
+      "slo": {
+        "ttft_s": 2.0,
+        "itl_ms": 50.0
+      },
+      "errors_sample": []
+    },
+    {
+      "isl": 8192,
+      "osl": 1024,
+      "concurrency": 32,
+      "n_ok": 64,
+      "n_err": 0,
+      "wall_s": 25.2687,
+      "ttft_s": {
+        "mean": 1.560718050925061,
+        "p50": 0.779467404820025,
+        "p95": 3.9715691763907666,
+        "p99": 4.2704182560928166
+      },
+      "tpot_ms": {
+        "mean": 10.795226670236618,
+        "p50": 11.41945862308889,
+        "p95": 11.737703451390553,
+        "p99": 11.969983760141885
+      },
+      "itl_ms": {
+        "mean": 10.795497696875298,
+        "p50": 8.394408971071243,
+        "p95": 9.25532877445221,
+        "p99": 129.08402562141413
+      },
+      "e2el_s": {
+        "mean": 12.580299069726607,
+        "p50": 12.534070707857609,
+        "p95": 15.650958159100263,
+        "p99": 15.989328712671995
+      },
+      "output_tps": 2593.56,
+      "total_tps": 23342.07,
+      "request_throughput_rps": 2.5328,
+      "goodput_rps": 1.7809,
+      "slo": {
+        "ttft_s": 2.0,
+        "itl_ms": 50.0
+      },
+      "errors_sample": []
+    },
+    {
+      "isl": 8192,
+      "osl": 8192,
+      "concurrency": 1,
+      "n_ok": 2,
+      "n_err": 0,
+      "wall_s": 53.7605,
+      "ttft_s": {
+        "mean": 0.1674815947189927,
+        "p50": 0.1674815947189927,
+        "p95": 0.1786534789018333,
+        "p99": 0.17964653527364136
+      },
+      "tpot_ms": {
+        "mean": 3.263719313940119,
+        "p50": 3.263719313940119,
+        "p95": 3.2638899277756797,
+        "p99": 3.2639050934499516
+      },
+      "itl_ms": {
+        "mean": 3.2637192791968364,
+        "p50": 3.2607819885015488,
+        "p95": 3.3415250480175014,
+        "p99": 3.4710304439067836
+      },
+      "e2el_s": {
+        "mean": 26.880089726299047,
+        "p50": 26.880089726299047,
+        "p95": 26.88824591320008,
+        "p99": 26.888970907591283
+      },
+      "output_tps": 304.76,
+      "total_tps": 609.52,
+      "request_throughput_rps": 0.0372,
+      "goodput_rps": 0.0372,
+      "slo": {
+        "ttft_s": 2.0,
+        "itl_ms": 50.0
+      },
+      "errors_sample": []
+    },
+    {
+      "isl": 8192,
+      "osl": 8192,
+      "concurrency": 4,
+      "n_ok": 8,
+      "n_err": 0,
+      "wall_s": 71.3819,
+      "ttft_s": {
+        "mean": 0.4259394546970725,
+        "p50": 0.4835478449240327,
+        "p95": 0.5602075155824423,
+        "p99": 0.5636882632225751
+      },
+      "tpot_ms": {
+        "mean": 4.307591992266027,
+        "p50": 4.300523637842316,
+        "p95": 4.337430030896473,
+        "p99": 4.337586483722803
+      },
+      "itl_ms": {
+        "mean": 4.307592902151075,
+        "p50": 4.281059838831425,
+        "p95": 4.577603191137314,
+        "p99": 4.798782430589199
+      },
+      "e2el_s": {
+        "mean": 35.687638039467856,
+        "p50": 35.688784210942686,
+        "p95": 35.6953952467069,
+        "p99": 35.69638707201928
+      },
+      "output_tps": 918.1,
+      "total_tps": 1836.21,
+      "request_throughput_rps": 0.1121,
+      "goodput_rps": 0.1121,
+      "slo": {
+        "ttft_s": 2.0,
+        "itl_ms": 50.0
+      },
+      "errors_sample": []
+    },
+    {
+      "isl": 8192,
+      "osl": 8192,
+      "concurrency": 8,
+      "n_ok": 16,
+      "n_err": 0,
+      "wall_s": 87.8196,
+      "ttft_s": {
+        "mean": 0.7300934094237164,
+        "p50": 0.7563513172790408,
+        "p95": 1.0943937175907195,
+        "p99": 1.1047872786410153
+      },
+      "tpot_ms": {
+        "mean": 5.273375028500255,
+        "p50": 5.270011209555894,
+        "p95": 5.335467046631118,
+        "p99": 5.337271079408757
+      },
+      "itl_ms": {
+        "mean": 5.273376826467324,
+        "p50": 5.227695219218731,
+        "p95": 5.603669211268425,
+        "p99": 5.802419725805521
+      },
+      "e2el_s": {
+        "mean": 43.90160778386053,
+        "p50": 43.90174689143896,
+        "p95": 43.91952838143334,
+        "p99": 43.925244936626406
+      },
+      "output_tps": 1492.51,
+      "total_tps": 2985.03,
+      "request_throughput_rps": 0.1822,
+      "goodput_rps": 0.1822,
+      "slo": {
+        "ttft_s": 2.0,
+        "itl_ms": 50.0
+      },
+      "errors_sample": []
+    },
+    {
+      "isl": 8192,
+      "osl": 8192,
+      "concurrency": 16,
+      "n_ok": 32,
+      "n_err": 0,
+      "wall_s": 111.7469,
+      "ttft_s": {
+        "mean": 1.164053300220985,
+        "p50": 1.255523193627596,
+        "p95": 2.0396652268245816,
+        "p99": 2.133708614464849
+      },
+      "tpot_ms": {
+        "mean": 6.679430544048538,
+        "p50": 6.667486980663908,
+        "p95": 6.7773255497197065,
+        "p99": 6.785631660233264
+      },
+      "itl_ms": {
+        "mean": 6.6794308980761485,
+        "p50": 6.53667189180851,
+        "p95": 7.210019230842589,
+        "p99": 7.6565757393837
+      },
+      "e2el_s": {
+        "mean": 55.851879680354614,
+        "p50": 55.856438644230366,
+        "p95": 56.39302750593051,
+        "p99": 56.556032060682774
+      },
+      "output_tps": 2345.87,
+      "total_tps": 4691.75,
+      "request_throughput_rps": 0.2864,
+      "goodput_rps": 0.2685,
+      "slo": {
+        "ttft_s": 2.0,
+        "itl_ms": 50.0
+      },
+      "errors_sample": []
+    },
+    {
+      "isl": 8192,
+      "osl": 8192,
+      "concurrency": 32,
+      "n_ok": 64,
+      "n_err": 0,
+      "wall_s": 155.1784,
+      "ttft_s": {
+        "mean": 1.5063107993919402,
+        "p50": 0.6605527652427554,
+        "p95": 3.9590759890153997,
+        "p99": 4.267389409132302
+      },
+      "tpot_ms": {
+        "mean": 9.284849839047148,
+        "p50": 9.35810845996775,
+        "p95": 9.405638274607492,
+        "p99": 9.428441262882227
+      },
+      "itl_ms": {
+        "mean": 9.284848490588015,
+        "p50": 8.950600400567055,
+        "p95": 10.11532573029399,
+        "p99": 10.64787095412612
+      },
+      "e2el_s": {
+        "mean": 77.53356404986698,
+        "p50": 77.49103634338826,
+        "p95": 80.65340865887701,
+        "p99": 80.98563646834343
+      },
+      "output_tps": 3378.62,
+      "total_tps": 6757.23,
+      "request_throughput_rps": 0.4124,
+      "goodput_rps": 0.29,
+      "slo": {
+        "ttft_s": 2.0,
+        "itl_ms": 50.0
+      },
+      "errors_sample": []
+    }
+  ],
+  "metrics_scrapes": {
+    "server": "# HELP python_gc_objects_collected_total Objects collected during gc\n# TYPE python_gc_objects_collected_total counter\npython_gc_objects_collected_total{generation=\"0\"} 62090.0\npython_gc_objects_collected_total{generation=\"1\"} 8647.0\npython_gc_objects_collected_total{generation=\"2\"} 1222.0\n# HELP python_gc_objects_uncollectable_total Uncollectable objects found during GC\n# TYPE python_gc_objects_uncollectable_total counter\npython_gc_objects_uncollectable_total{generation=\"0\"} 0.0\npython_gc_objects_uncollectable_total{generation=\"1\"} 0.0\npython_gc_objects_uncollectable_total{generation=\"2\"} 0.0\n# HELP python_gc_collections_total Number of times this generation was collected\n# TYPE python_gc_collections_total counter\npython_gc_collections_total{generation=\"0\"} 2218.0\npython_gc_collections_total{generation=\"1\"} 201.0\npython_gc_collections_total{generation=\"2\"} 11.0\n# HELP python_info Python platform information\n# TYPE python_info gauge\npython_info{implementation=\"CPython\",major=\"3\",minor=\"12\",patchlevel=\"3\",version=\"3.12.3\"} 1.0\n# HELP process_virtual_memory_bytes Virtual memory size in bytes.\n# TYPE process_virtual_memory_bytes gauge\nprocess_virtual_memory_bytes 3.0209441792e+010\n# HELP process_resident_memory_bytes Resident memory size in bytes.\n# TYPE process_resident_memory_bytes gauge\nprocess_resident_memory_bytes 1.88278784e+09\n# HELP process_start_time_seconds Start time of the process since unix epoch in seconds.\n# TYPE process_start_time_seconds gauge\nprocess_start_time_seconds 1.78777344634e+09\n# HELP process_cpu_seconds_total Total user and system CPU time spent in seconds.\n# TYPE process_cpu_seconds_total counter\nprocess_cpu_seconds_total 389.13\n# HELP process_open_fds Number of open file descriptors.\n# TYPE process_open_fds gauge\nprocess_open_fds 43.0\n# HELP process_max_fds Maximum number of open file descriptors.\n# TYPE process_max_fds gauge\nprocess_max_fds 65535.0\n# HELP vllm:estimated_flops_per_gpu_total Estimated number of floating point operations per GPU (for Model Flops Utilization calculations).\n# TYPE vllm:estimated_flops_per_gpu_total counter\nvllm:estimated_flops_per_gpu_total{engine=\"0\",model_name=\"openai/gpt-oss-20b\"} 0.0\n# HELP vllm:estimated_flops_per_gpu_created Estimated number of floating point operations per GPU (for Model Flops Utilization calculations).\n# TYPE vllm:estimated_flops_per_gpu_created gauge\nvllm:estimated_flops_per_gpu_created{engine=\"0\",model_name=\"openai/gpt-oss-20b\"} 1.7877735588133154e+09\n# HELP vllm:estimated_read_bytes_per_gpu_total Estimated number of bytes read from memory per GPU (for Model Flops Utilization calculations).\n# TYPE vllm:estimated_read_bytes_per_gpu_total counter\nvllm:estimated_read_bytes_per_gpu_total{engine=\"0\",model_name=\"openai/gpt-oss-20b\"} 0.0\n# HELP vllm:estimated_read_bytes_per_gpu_created Estimated number of bytes read from memory per GPU (for Model Flops Utilization calculations).\n# TYPE vllm:estimated_read_bytes_per_gpu_created gauge\nvllm:estimated_read_bytes_per_gpu_created{engine=\"0\",model_name=\"openai/gpt-oss-20b\"} 1.7877735588134108e+09\n# HELP vllm:estimated_write_bytes_per_gpu_total Estimated number of bytes written to memory per GPU (for Model Flops Utilization calculations).\n# TYPE vllm:estimated_write_bytes_per_gpu_total counter\nvllm:estimated_write_bytes_per_gpu_total{engine=\"0\",model_name=\"openai/gpt-oss-20b\"} 0.0\n# HELP vllm:estimated_write_bytes_per_gpu_created Estimated number of bytes written to memory per GPU (for Model Flops Utilization calculations).\n# TYPE vllm:estimated_write_bytes_per_gpu_created gauge\nvllm:estimated_write_bytes_per_gpu_created{engine=\"0\",model_name=\"openai/gpt-oss-20b\"} 1.7877735588134725e+09\n# HELP vllm:num_requests_running Number of requests in model execution batches.\n# TYPE vllm:num_requests_running gauge\nvllm:num_requests_running{engine=\"0\",model_name=\"openai/gpt-oss-20b\"} 0.0\n# HELP vllm:num_requests_waiting Number of requests waiting to be processed.\n# TYPE vllm:num_requests_waiting gauge\nvllm:num_requests_waiting{engine=\"0\",model_name=\"openai/gpt-oss-20b\"} 0.0\n# HELP vllm:num_requests_waiting_by_reason Number of waiting requests by reason. Reason labels: 'capacity' = waiting for scheduling capacity; 'deferred' = deferred by transient constraints (LoRA budget, KV transfer, blocked status). Sum of all reasons equals vllm:num_requests_waiting.\n# TYPE vllm:num_requests_waiting_by_reason gauge\nvllm:num_requests_waiting_by_reason{engine=\"0\",model_name=\"openai/gpt-oss-20b\",reason=\"capacity\"} 0.0\nvllm:num_requests_waiting_by_reason{engine=\"0\",model_name=\"openai/gpt-oss-20b\",reason=\"deferred\"} 0.0\n# HELP vllm:engine_sleep_state Engine sleep state; awake = 0 means engine is sleeping; awake = 1 means engine is awake; weights_offloaded = 1 means sleep level 1; discard_all = 1 means sleep level 2.\n# TYPE vllm:engine_sleep_state gauge\nvllm:engine_sleep_state{engine=\"0\",model_name=\"openai/gpt-oss-20b\",sleep_state=\"awake\"} 1.0\nvllm:engine_sleep_state{engine=\"0\",model_name=\"openai/gpt-oss-20b\",sleep_state=\"weights_offloaded\"} 0.0\nvllm:engine_sleep_state{engine=\"0\",model_name=\"openai/gpt-oss-20b\",sleep_state=\"discard_all\"} 0.0\n# HELP vllm:kv_cache_usage_perc KV-cache usage. 1 means 100 percent usage.\n# TYPE vllm:kv_cache_usage_perc gauge\nvllm:kv_cache_usage_perc{engine=\"0\",model_name=\"openai/gpt-oss-20b\"} 0.0\n# HELP vllm:prefix_cache_queries_total Prefix cache queries, in terms of number of queried tokens.\n# TYPE vllm:prefix_cache_queries_total counter\nvllm:prefix_cache_queries_total{engine=\"0\",model_name=\"openai/gpt-oss-20b\"} 0.0\n# HELP vllm:prefix_cache_queries_created Prefix cache queries, in terms of number of queried tokens.\n# TYPE vllm:prefix_cache_queries_created gauge\nvllm:prefix_cache_queries_created{engine=\"0\",model_name=\"openai/gpt-oss-20b\"} 1.7877735588140762e+09\n# HELP vllm:prefix_cache_hits_total Prefix cache hits, in terms of number of cached tokens.\n# TYPE vllm:prefix_cache_hits_total counter\nvllm:prefix_cache_hits_total{engine=\"0\",model_name=\"openai/gpt-oss-20b\"} 0.0\n# HELP vllm:prefix_cache_hits_created Prefix cache hits, in terms of number of cached tokens.\n# TYPE vllm:prefix_cache_hits_created gauge\nvllm:prefix_cache_hits_created{engine=\"0\",model_name=\"openai/gpt-oss-20b\"} 1.787773558814119e+09\n# HELP vllm:external_prefix_cache_queries_total External prefix cache queries from KV connector cross-instance cache sharing, in terms of number of queried tokens.\n# TYPE vllm:external_prefix_cache_queries_total counter\nvllm:external_prefix_cache_queries_total{engine=\"0\",model_name=\"openai/gpt-oss-20b\"} 0.0\n# HELP vllm:external_prefix_cache_queries_created External prefix cache queries from KV connector cross-instance cache sharing, in terms of number of queried tokens.\n# TYPE vllm:external_prefix_cache_queries_created gauge\nvllm:external_prefix_cache_queries_created{engine=\"0\",model_name=\"openai/gpt-oss-20b\"} 1.787773558814161e+09\n# HELP vllm:external_prefix_cache_hits_total External prefix cache hits from KV connector cross-instance cache sharing, in terms of number of cached tokens.\n# TYPE vllm:external_prefix_cache_hits_total counter\nvllm:external_prefix_cache_hits_total{engine=\"0\",model_name=\"openai/gpt-oss-20b\"} 0.0\n# HELP vllm:external_prefix_cache_hits_created External prefix cache hits from KV connector cross-instance cache sharing, in terms of number of cached tokens.\n# TYPE vllm:external_prefix_cache_hits_created gauge\nvllm:external_prefix_cache_hits_created{engine=\"0\",model_name=\"openai/gpt-oss-20b\"} 1.7877735588142054e+09\n# HELP vllm:mm_cache_queries_total Multi-modal cache queries, in terms of number of queried items.\n# TYPE vllm:mm_cache_queries_total counter\nvllm:mm_cache_queries_total{engine=\"0\",model_name=\"openai/gpt-oss-20b\"} 0.0\n# HELP vllm:mm_cache_queries_created Multi-modal cache queries, in terms of number of queried items.\n# TYPE vllm:mm_cache_queries_created gauge\nvllm:mm_cache_queries_created{engine=\"0\",model_name=\"openai/gpt-oss-20b\"} 1.7877735588142548e+09\n# HELP vllm:mm_cache_hits_total Multi-modal cache hits, in terms of number of cached items.\n# TYPE vllm:mm_cache_hits_total counter\nvllm:mm_cache_hits_total{engine=\"0\",model_name=\"openai/gpt-oss-20b\"} 0.0\n# HELP vllm:mm_cache_hits_created Multi-modal cache hits, in terms of number of cached items.\n# TYPE vllm:mm_cache_hits_created gauge\nvllm:mm_cache_hits_created{engine=\"0\",model_name=\"openai/gpt-oss-20b\"} 1.7877735588142905e+09\n# HELP vllm:num_preemptions_total Cumulative number of preemption from the engine.\n# TYPE vllm:num_preemptions_total counter\nvllm:num_preemptions_total{engine=\"0\",model_name=\"openai/gpt-oss-20b\"} 0.0\n# HELP vllm:num_preemptions_created Cumulative number of preemption from the engine.\n# TYPE vllm:num_preemptions_created gauge\nvllm:num_preemptions_created{engine=\"0\",model_name=\"openai/gpt-oss-20b\"} 1.7877735588143287e+09\n# HELP vllm:prompt_tokens_total Number of prefill tokens processed.\n# TYPE vllm:prompt_tokens_total counter\nvllm:prompt_tokens_total{engine=\"0\",model_name=\"openai/gpt-oss-20b\"} 2.414592e+06\n# HELP vllm:prompt_tokens_created Number of prefill tokens processed.\n# TYPE vllm:prompt_tokens_created gauge\nvllm:prompt_tokens_created{engine=\"0\",model_name=\"openai/gpt-oss-20b\"} 1.7877735588143692e+09\n# HELP vllm:prompt_tokens_by_source_total Number of prompt tokens by source.\n# TYPE vllm:prompt_tokens_by_source_total counter\nvllm:prompt_tokens_by_source_total{engine=\"0\",model_name=\"openai/gpt-oss-20b\",source=\"local_compute\"} 2.414592e+06\nvllm:prompt_tokens_by_source_total{engine=\"0\",model_name=\"openai/gpt-oss-20b\",source=\"local_cache_hit\"} 0.0\nvllm:prompt_tokens_by_source_total{engine=\"0\",model_name=\"openai/gpt-oss-20b\",source=\"external_kv_transfer\"} 0.0\n# HELP vllm:prompt_tokens_by_source_created Number of prompt tokens by source.\n# TYPE vllm:prompt_tokens_by_source_created gauge\nvllm:prompt_tokens_by_source_created{engine=\"0\",model_name=\"openai/gpt-oss-20b\",source=\"local_compute\"} 1.7877735588144271e+09\nvllm:prompt_tokens_by_source_created{engine=\"0\",model_name=\"openai/gpt-oss-20b\",source=\"local_cache_hit\"} 1.7877735588144467e+09\nvllm:prompt_tokens_by_source_created{engine=\"0\",model_name=\"openai/gpt-oss-20b\",source=\"external_kv_transfer\"} 1.7877735588144653e+09\n# HELP vllm:prompt_tokens_cached_total Number of cached prompt tokens (local + external).\n# TYPE vllm:prompt_tokens_cached_total counter\nvllm:prompt_tokens_cached_total{engine=\"0\",model_name=\"openai/gpt-oss-20b\"} 0.0\n# HELP vllm:prompt_tokens_cached_created Number of cached prompt tokens (local + external).\n# TYPE vllm:prompt_tokens_cached_created gauge\nvllm:prompt_tokens_cached_created{engine=\"0\",model_name=\"openai/gpt-oss-20b\"} 1.7877735588145058e+09\n# HELP vllm:generation_tokens_total Number of generation tokens processed.\n# TYPE vllm:generation_tokens_total counter\nvllm:generation_tokens_total{engine=\"0\",model_name=\"openai/gpt-oss-20b\"} 2.24928e+06\n# HELP vllm:generation_tokens_created Number of generation tokens processed.\n# TYPE vllm:generation_tokens_created gauge\nvllm:generation_tokens_created{engine=\"0\",model_name=\"openai/gpt-oss-20b\"} 1.7877735588145442e+09\n# HELP vllm:request_success_total Count of successfully processed requests.\n# TYPE vllm:request_success_total counter\nvllm:request_success_total{engine=\"0\",finished_reason=\"stop\",model_name=\"openai/gpt-oss-20b\"} 0.0\nvllm:request_success_total{engine=\"0\",finished_reason=\"length\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:request_success_total{engine=\"0\",finished_reason=\"abort\",model_name=\"openai/gpt-oss-20b\"} 0.0\nvllm:request_success_total{engine=\"0\",finished_reason=\"error\",model_name=\"openai/gpt-oss-20b\"} 0.0\nvllm:request_success_total{engine=\"0\",finished_reason=\"repetition\",model_name=\"openai/gpt-oss-20b\"} 0.0\n# HELP vllm:request_success_created Count of successfully processed requests.\n# TYPE vllm:request_success_created gauge\nvllm:request_success_created{engine=\"0\",finished_reason=\"stop\",model_name=\"openai/gpt-oss-20b\"} 1.787773558814617e+09\nvllm:request_success_created{engine=\"0\",finished_reason=\"length\",model_name=\"openai/gpt-oss-20b\"} 1.787773558814639e+09\nvllm:request_success_created{engine=\"0\",finished_reason=\"abort\",model_name=\"openai/gpt-oss-20b\"} 1.7877735588146758e+09\nvllm:request_success_created{engine=\"0\",finished_reason=\"error\",model_name=\"openai/gpt-oss-20b\"} 1.7877735588146973e+09\nvllm:request_success_created{engine=\"0\",finished_reason=\"repetition\",model_name=\"openai/gpt-oss-20b\"} 1.7877735588147147e+09\n# HELP vllm:request_prompt_tokens Number of prefill tokens processed.\n# TYPE vllm:request_prompt_tokens histogram\nvllm:request_prompt_tokens_bucket{engine=\"0\",le=\"1.0\",model_name=\"openai/gpt-oss-20b\"} 0.0\nvllm:request_prompt_tokens_bucket{engine=\"0\",le=\"2.0\",model_name=\"openai/gpt-oss-20b\"} 0.0\nvllm:request_prompt_tokens_bucket{engine=\"0\",le=\"5.0\",model_name=\"openai/gpt-oss-20b\"} 0.0\nvllm:request_prompt_tokens_bucket{engine=\"0\",le=\"10.0\",model_name=\"openai/gpt-oss-20b\"} 0.0\nvllm:request_prompt_tokens_bucket{engine=\"0\",le=\"20.0\",model_name=\"openai/gpt-oss-20b\"} 0.0\nvllm:request_prompt_tokens_bucket{engine=\"0\",le=\"50.0\",model_name=\"openai/gpt-oss-20b\"} 0.0\nvllm:request_prompt_tokens_bucket{engine=\"0\",le=\"100.0\",model_name=\"openai/gpt-oss-20b\"} 0.0\nvllm:request_prompt_tokens_bucket{engine=\"0\",le=\"200.0\",model_name=\"openai/gpt-oss-20b\"} 0.0\nvllm:request_prompt_tokens_bucket{engine=\"0\",le=\"500.0\",model_name=\"openai/gpt-oss-20b\"} 0.0\nvllm:request_prompt_tokens_bucket{engine=\"0\",le=\"1000.0\",model_name=\"openai/gpt-oss-20b\"} 0.0\nvllm:request_prompt_tokens_bucket{engine=\"0\",le=\"2000.0\",model_name=\"openai/gpt-oss-20b\"} 262.0\nvllm:request_prompt_tokens_bucket{engine=\"0\",le=\"5000.0\",model_name=\"openai/gpt-oss-20b\"} 262.0\nvllm:request_prompt_tokens_bucket{engine=\"0\",le=\"10000.0\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:request_prompt_tokens_bucket{engine=\"0\",le=\"20000.0\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:request_prompt_tokens_bucket{engine=\"0\",le=\"+Inf\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:request_prompt_tokens_count{engine=\"0\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:request_prompt_tokens_sum{engine=\"0\",model_name=\"openai/gpt-oss-20b\"} 2.414592e+06\n# HELP vllm:request_prompt_tokens_created Number of prefill tokens processed.\n# TYPE vllm:request_prompt_tokens_created gauge\nvllm:request_prompt_tokens_created{engine=\"0\",model_name=\"openai/gpt-oss-20b\"} 1.7877735588148646e+09\n# HELP vllm:request_generation_tokens Number of generation tokens processed.\n# TYPE vllm:request_generation_tokens histogram\nvllm:request_generation_tokens_bucket{engine=\"0\",le=\"1.0\",model_name=\"openai/gpt-oss-20b\"} 0.0\nvllm:request_generation_tokens_bucket{engine=\"0\",le=\"2.0\",model_name=\"openai/gpt-oss-20b\"} 0.0\nvllm:request_generation_tokens_bucket{engine=\"0\",le=\"5.0\",model_name=\"openai/gpt-oss-20b\"} 0.0\nvllm:request_generation_tokens_bucket{engine=\"0\",le=\"10.0\",model_name=\"openai/gpt-oss-20b\"} 0.0\nvllm:request_generation_tokens_bucket{engine=\"0\",le=\"20.0\",model_name=\"openai/gpt-oss-20b\"} 36.0\nvllm:request_generation_tokens_bucket{engine=\"0\",le=\"50.0\",model_name=\"openai/gpt-oss-20b\"} 36.0\nvllm:request_generation_tokens_bucket{engine=\"0\",le=\"100.0\",model_name=\"openai/gpt-oss-20b\"} 36.0\nvllm:request_generation_tokens_bucket{engine=\"0\",le=\"200.0\",model_name=\"openai/gpt-oss-20b\"} 36.0\nvllm:request_generation_tokens_bucket{engine=\"0\",le=\"500.0\",model_name=\"openai/gpt-oss-20b\"} 36.0\nvllm:request_generation_tokens_bucket{engine=\"0\",le=\"1000.0\",model_name=\"openai/gpt-oss-20b\"} 36.0\nvllm:request_generation_tokens_bucket{engine=\"0\",le=\"2000.0\",model_name=\"openai/gpt-oss-20b\"} 280.0\nvllm:request_generation_tokens_bucket{engine=\"0\",le=\"5000.0\",model_name=\"openai/gpt-oss-20b\"} 280.0\nvllm:request_generation_tokens_bucket{engine=\"0\",le=\"10000.0\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:request_generation_tokens_bucket{engine=\"0\",le=\"20000.0\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:request_generation_tokens_bucket{engine=\"0\",le=\"+Inf\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:request_generation_tokens_count{engine=\"0\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:request_generation_tokens_sum{engine=\"0\",model_name=\"openai/gpt-oss-20b\"} 2.24928e+06\n# HELP vllm:request_generation_tokens_created Number of generation tokens processed.\n# TYPE vllm:request_generation_tokens_created gauge\nvllm:request_generation_tokens_created{engine=\"0\",model_name=\"openai/gpt-oss-20b\"} 1.787773558815057e+09\n# HELP vllm:iteration_tokens_total Histogram of number of tokens per engine_step.\n# TYPE vllm:iteration_tokens_total histogram\nvllm:iteration_tokens_total_bucket{engine=\"0\",le=\"1.0\",model_name=\"openai/gpt-oss-20b\"} 36979.0\nvllm:iteration_tokens_total_bucket{engine=\"0\",le=\"8.0\",model_name=\"openai/gpt-oss-20b\"} 110956.0\nvllm:iteration_tokens_total_bucket{engine=\"0\",le=\"16.0\",model_name=\"openai/gpt-oss-20b\"} 147794.0\nvllm:iteration_tokens_total_bucket{engine=\"0\",le=\"32.0\",model_name=\"openai/gpt-oss-20b\"} 184557.0\nvllm:iteration_tokens_total_bucket{engine=\"0\",le=\"64.0\",model_name=\"openai/gpt-oss-20b\"} 184557.0\nvllm:iteration_tokens_total_bucket{engine=\"0\",le=\"128.0\",model_name=\"openai/gpt-oss-20b\"} 184557.0\nvllm:iteration_tokens_total_bucket{engine=\"0\",le=\"256.0\",model_name=\"openai/gpt-oss-20b\"} 184557.0\nvllm:iteration_tokens_total_bucket{engine=\"0\",le=\"512.0\",model_name=\"openai/gpt-oss-20b\"} 184557.0\nvllm:iteration_tokens_total_bucket{engine=\"0\",le=\"1024.0\",model_name=\"openai/gpt-oss-20b\"} 184557.0\nvllm:iteration_tokens_total_bucket{engine=\"0\",le=\"2048.0\",model_name=\"openai/gpt-oss-20b\"} 184599.0\nvllm:iteration_tokens_total_bucket{engine=\"0\",le=\"4096.0\",model_name=\"openai/gpt-oss-20b\"} 184604.0\nvllm:iteration_tokens_total_bucket{engine=\"0\",le=\"8192.0\",model_name=\"openai/gpt-oss-20b\"} 184620.0\nvllm:iteration_tokens_total_bucket{engine=\"0\",le=\"16384.0\",model_name=\"openai/gpt-oss-20b\"} 184894.0\nvllm:iteration_tokens_total_bucket{engine=\"0\",le=\"+Inf\",model_name=\"openai/gpt-oss-20b\"} 184894.0\nvllm:iteration_tokens_total_count{engine=\"0\",model_name=\"openai/gpt-oss-20b\"} 184894.0\nvllm:iteration_tokens_total_sum{engine=\"0\",model_name=\"openai/gpt-oss-20b\"} 4.663872e+06\n# HELP vllm:iteration_tokens_total_created Histogram of number of tokens per engine_step.\n# TYPE vllm:iteration_tokens_total_created gauge\nvllm:iteration_tokens_total_created{engine=\"0\",model_name=\"openai/gpt-oss-20b\"} 1.787773558815204e+09\n# HELP vllm:request_max_num_generation_tokens Histogram of maximum number of requested generation tokens.\n# TYPE vllm:request_max_num_generation_tokens histogram\nvllm:request_max_num_generation_tokens_bucket{engine=\"0\",le=\"1.0\",model_name=\"openai/gpt-oss-20b\"} 0.0\nvllm:request_max_num_generation_tokens_bucket{engine=\"0\",le=\"2.0\",model_name=\"openai/gpt-oss-20b\"} 0.0\nvllm:request_max_num_generation_tokens_bucket{engine=\"0\",le=\"5.0\",model_name=\"openai/gpt-oss-20b\"} 0.0\nvllm:request_max_num_generation_tokens_bucket{engine=\"0\",le=\"10.0\",model_name=\"openai/gpt-oss-20b\"} 0.0\nvllm:request_max_num_generation_tokens_bucket{engine=\"0\",le=\"20.0\",model_name=\"openai/gpt-oss-20b\"} 36.0\nvllm:request_max_num_generation_tokens_bucket{engine=\"0\",le=\"50.0\",model_name=\"openai/gpt-oss-20b\"} 36.0\nvllm:request_max_num_generation_tokens_bucket{engine=\"0\",le=\"100.0\",model_name=\"openai/gpt-oss-20b\"} 36.0\nvllm:request_max_num_generation_tokens_bucket{engine=\"0\",le=\"200.0\",model_name=\"openai/gpt-oss-20b\"} 36.0\nvllm:request_max_num_generation_tokens_bucket{engine=\"0\",le=\"500.0\",model_name=\"openai/gpt-oss-20b\"} 36.0\nvllm:request_max_num_generation_tokens_bucket{engine=\"0\",le=\"1000.0\",model_name=\"openai/gpt-oss-20b\"} 36.0\nvllm:request_max_num_generation_tokens_bucket{engine=\"0\",le=\"2000.0\",model_name=\"openai/gpt-oss-20b\"} 280.0\nvllm:request_max_num_generation_tokens_bucket{engine=\"0\",le=\"5000.0\",model_name=\"openai/gpt-oss-20b\"} 280.0\nvllm:request_max_num_generation_tokens_bucket{engine=\"0\",le=\"10000.0\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:request_max_num_generation_tokens_bucket{engine=\"0\",le=\"20000.0\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:request_max_num_generation_tokens_bucket{engine=\"0\",le=\"+Inf\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:request_max_num_generation_tokens_count{engine=\"0\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:request_max_num_generation_tokens_sum{engine=\"0\",model_name=\"openai/gpt-oss-20b\"} 2.24928e+06\n# HELP vllm:request_max_num_generation_tokens_created Histogram of maximum number of requested generation tokens.\n# TYPE vllm:request_max_num_generation_tokens_created gauge\nvllm:request_max_num_generation_tokens_created{engine=\"0\",model_name=\"openai/gpt-oss-20b\"} 1.78777355881533e+09\n# HELP vllm:request_params_n Histogram of the n request parameter.\n# TYPE vllm:request_params_n histogram\nvllm:request_params_n_bucket{engine=\"0\",le=\"1.0\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:request_params_n_bucket{engine=\"0\",le=\"2.0\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:request_params_n_bucket{engine=\"0\",le=\"5.0\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:request_params_n_bucket{engine=\"0\",le=\"10.0\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:request_params_n_bucket{engine=\"0\",le=\"20.0\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:request_params_n_bucket{engine=\"0\",le=\"+Inf\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:request_params_n_count{engine=\"0\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:request_params_n_sum{engine=\"0\",model_name=\"openai/gpt-oss-20b\"} 524.0\n# HELP vllm:request_params_n_created Histogram of the n request parameter.\n# TYPE vllm:request_params_n_created gauge\nvllm:request_params_n_created{engine=\"0\",model_name=\"openai/gpt-oss-20b\"} 1.7877735588154457e+09\n# HELP vllm:request_params_max_tokens Histogram of the max_tokens request parameter.\n# TYPE vllm:request_params_max_tokens histogram\nvllm:request_params_max_tokens_bucket{engine=\"0\",le=\"1.0\",model_name=\"openai/gpt-oss-20b\"} 0.0\nvllm:request_params_max_tokens_bucket{engine=\"0\",le=\"2.0\",model_name=\"openai/gpt-oss-20b\"} 0.0\nvllm:request_params_max_tokens_bucket{engine=\"0\",le=\"5.0\",model_name=\"openai/gpt-oss-20b\"} 0.0\nvllm:request_params_max_tokens_bucket{engine=\"0\",le=\"10.0\",model_name=\"openai/gpt-oss-20b\"} 0.0\nvllm:request_params_max_tokens_bucket{engine=\"0\",le=\"20.0\",model_name=\"openai/gpt-oss-20b\"} 36.0\nvllm:request_params_max_tokens_bucket{engine=\"0\",le=\"50.0\",model_name=\"openai/gpt-oss-20b\"} 36.0\nvllm:request_params_max_tokens_bucket{engine=\"0\",le=\"100.0\",model_name=\"openai/gpt-oss-20b\"} 36.0\nvllm:request_params_max_tokens_bucket{engine=\"0\",le=\"200.0\",model_name=\"openai/gpt-oss-20b\"} 36.0\nvllm:request_params_max_tokens_bucket{engine=\"0\",le=\"500.0\",model_name=\"openai/gpt-oss-20b\"} 36.0\nvllm:request_params_max_tokens_bucket{engine=\"0\",le=\"1000.0\",model_name=\"openai/gpt-oss-20b\"} 36.0\nvllm:request_params_max_tokens_bucket{engine=\"0\",le=\"2000.0\",model_name=\"openai/gpt-oss-20b\"} 280.0\nvllm:request_params_max_tokens_bucket{engine=\"0\",le=\"5000.0\",model_name=\"openai/gpt-oss-20b\"} 280.0\nvllm:request_params_max_tokens_bucket{engine=\"0\",le=\"10000.0\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:request_params_max_tokens_bucket{engine=\"0\",le=\"20000.0\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:request_params_max_tokens_bucket{engine=\"0\",le=\"+Inf\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:request_params_max_tokens_count{engine=\"0\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:request_params_max_tokens_sum{engine=\"0\",model_name=\"openai/gpt-oss-20b\"} 2.24928e+06\n# HELP vllm:request_params_max_tokens_created Histogram of the max_tokens request parameter.\n# TYPE vllm:request_params_max_tokens_created gauge\nvllm:request_params_max_tokens_created{engine=\"0\",model_name=\"openai/gpt-oss-20b\"} 1.7877735588155377e+09\n# HELP vllm:time_to_first_token_seconds Histogram of time to first token in seconds.\n# TYPE vllm:time_to_first_token_seconds histogram\nvllm:time_to_first_token_seconds_bucket{engine=\"0\",le=\"0.001\",model_name=\"openai/gpt-oss-20b\"} 0.0\nvllm:time_to_first_token_seconds_bucket{engine=\"0\",le=\"0.005\",model_name=\"openai/gpt-oss-20b\"} 0.0\nvllm:time_to_first_token_seconds_bucket{engine=\"0\",le=\"0.01\",model_name=\"openai/gpt-oss-20b\"} 0.0\nvllm:time_to_first_token_seconds_bucket{engine=\"0\",le=\"0.02\",model_name=\"openai/gpt-oss-20b\"} 0.0\nvllm:time_to_first_token_seconds_bucket{engine=\"0\",le=\"0.04\",model_name=\"openai/gpt-oss-20b\"} 7.0\nvllm:time_to_first_token_seconds_bucket{engine=\"0\",le=\"0.06\",model_name=\"openai/gpt-oss-20b\"} 8.0\nvllm:time_to_first_token_seconds_bucket{engine=\"0\",le=\"0.08\",model_name=\"openai/gpt-oss-20b\"} 29.0\nvllm:time_to_first_token_seconds_bucket{engine=\"0\",le=\"0.1\",model_name=\"openai/gpt-oss-20b\"} 36.0\nvllm:time_to_first_token_seconds_bucket{engine=\"0\",le=\"0.25\",model_name=\"openai/gpt-oss-20b\"} 151.0\nvllm:time_to_first_token_seconds_bucket{engine=\"0\",le=\"0.5\",model_name=\"openai/gpt-oss-20b\"} 245.0\nvllm:time_to_first_token_seconds_bucket{engine=\"0\",le=\"0.75\",model_name=\"openai/gpt-oss-20b\"} 353.0\nvllm:time_to_first_token_seconds_bucket{engine=\"0\",le=\"1.0\",model_name=\"openai/gpt-oss-20b\"} 401.0\nvllm:time_to_first_token_seconds_bucket{engine=\"0\",le=\"2.5\",model_name=\"openai/gpt-oss-20b\"} 494.0\nvllm:time_to_first_token_seconds_bucket{engine=\"0\",le=\"5.0\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:time_to_first_token_seconds_bucket{engine=\"0\",le=\"7.5\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:time_to_first_token_seconds_bucket{engine=\"0\",le=\"10.0\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:time_to_first_token_seconds_bucket{engine=\"0\",le=\"20.0\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:time_to_first_token_seconds_bucket{engine=\"0\",le=\"40.0\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:time_to_first_token_seconds_bucket{engine=\"0\",le=\"80.0\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:time_to_first_token_seconds_bucket{engine=\"0\",le=\"160.0\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:time_to_first_token_seconds_bucket{engine=\"0\",le=\"640.0\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:time_to_first_token_seconds_bucket{engine=\"0\",le=\"2560.0\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:time_to_first_token_seconds_bucket{engine=\"0\",le=\"+Inf\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:time_to_first_token_seconds_count{engine=\"0\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:time_to_first_token_seconds_sum{engine=\"0\",model_name=\"openai/gpt-oss-20b\"} 416.28669238090515\n# HELP vllm:time_to_first_token_seconds_created Histogram of time to first token in seconds.\n# TYPE vllm:time_to_first_token_seconds_created gauge\nvllm:time_to_first_token_seconds_created{engine=\"0\",model_name=\"openai/gpt-oss-20b\"} 1.78777355881593e+09\n# HELP vllm:inter_token_latency_seconds Histogram of inter-token latency in seconds.\n# TYPE vllm:inter_token_latency_seconds histogram\nvllm:inter_token_latency_seconds_bucket{engine=\"0\",le=\"0.01\",model_name=\"openai/gpt-oss-20b\"} 2.233166e+06\nvllm:inter_token_latency_seconds_bucket{engine=\"0\",le=\"0.025\",model_name=\"openai/gpt-oss-20b\"} 2.245123e+06\nvllm:inter_token_latency_seconds_bucket{engine=\"0\",le=\"0.05\",model_name=\"openai/gpt-oss-20b\"} 2.245223e+06\nvllm:inter_token_latency_seconds_bucket{engine=\"0\",le=\"0.075\",model_name=\"openai/gpt-oss-20b\"} 2.245327e+06\nvllm:inter_token_latency_seconds_bucket{engine=\"0\",le=\"0.1\",model_name=\"openai/gpt-oss-20b\"} 2.245432e+06\nvllm:inter_token_latency_seconds_bucket{engine=\"0\",le=\"0.15\",model_name=\"openai/gpt-oss-20b\"} 2.248733e+06\nvllm:inter_token_latency_seconds_bucket{engine=\"0\",le=\"0.2\",model_name=\"openai/gpt-oss-20b\"} 2.248734e+06\nvllm:inter_token_latency_seconds_bucket{engine=\"0\",le=\"0.3\",model_name=\"openai/gpt-oss-20b\"} 2.248734e+06\nvllm:inter_token_latency_seconds_bucket{engine=\"0\",le=\"0.4\",model_name=\"openai/gpt-oss-20b\"} 2.248734e+06\nvllm:inter_token_latency_seconds_bucket{engine=\"0\",le=\"0.5\",model_name=\"openai/gpt-oss-20b\"} 2.248734e+06\nvllm:inter_token_latency_seconds_bucket{engine=\"0\",le=\"0.75\",model_name=\"openai/gpt-oss-20b\"} 2.248751e+06\nvllm:inter_token_latency_seconds_bucket{engine=\"0\",le=\"1.0\",model_name=\"openai/gpt-oss-20b\"} 2.248755e+06\nvllm:inter_token_latency_seconds_bucket{engine=\"0\",le=\"2.5\",model_name=\"openai/gpt-oss-20b\"} 2.248756e+06\nvllm:inter_token_latency_seconds_bucket{engine=\"0\",le=\"5.0\",model_name=\"openai/gpt-oss-20b\"} 2.248756e+06\nvllm:inter_token_latency_seconds_bucket{engine=\"0\",le=\"7.5\",model_name=\"openai/gpt-oss-20b\"} 2.248756e+06\nvllm:inter_token_latency_seconds_bucket{engine=\"0\",le=\"10.0\",model_name=\"openai/gpt-oss-20b\"} 2.248756e+06\nvllm:inter_token_latency_seconds_bucket{engine=\"0\",le=\"20.0\",model_name=\"openai/gpt-oss-20b\"} 2.248756e+06\nvllm:inter_token_latency_seconds_bucket{engine=\"0\",le=\"40.0\",model_name=\"openai/gpt-oss-20b\"} 2.248756e+06\nvllm:inter_token_latency_seconds_bucket{engine=\"0\",le=\"80.0\",model_name=\"openai/gpt-oss-20b\"} 2.248756e+06\nvllm:inter_token_latency_seconds_bucket{engine=\"0\",le=\"+Inf\",model_name=\"openai/gpt-oss-20b\"} 2.248756e+06\nvllm:inter_token_latency_seconds_count{engine=\"0\",model_name=\"openai/gpt-oss-20b\"} 2.248756e+06\nvllm:inter_token_latency_seconds_sum{engine=\"0\",model_name=\"openai/gpt-oss-20b\"} 14648.848092895001\n# HELP vllm:inter_token_latency_seconds_created Histogram of inter-token latency in seconds.\n# TYPE vllm:inter_token_latency_seconds_created gauge\nvllm:inter_token_latency_seconds_created{engine=\"0\",model_name=\"openai/gpt-oss-20b\"} 1.7877735588160944e+09\n# HELP vllm:request_time_per_output_token_seconds Histogram of time_per_output_token_seconds per request.\n# TYPE vllm:request_time_per_output_token_seconds histogram\nvllm:request_time_per_output_token_seconds_bucket{engine=\"0\",le=\"0.01\",model_name=\"openai/gpt-oss-20b\"} 467.0\nvllm:request_time_per_output_token_seconds_bucket{engine=\"0\",le=\"0.025\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:request_time_per_output_token_seconds_bucket{engine=\"0\",le=\"0.05\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:request_time_per_output_token_seconds_bucket{engine=\"0\",le=\"0.075\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:request_time_per_output_token_seconds_bucket{engine=\"0\",le=\"0.1\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:request_time_per_output_token_seconds_bucket{engine=\"0\",le=\"0.15\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:request_time_per_output_token_seconds_bucket{engine=\"0\",le=\"0.2\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:request_time_per_output_token_seconds_bucket{engine=\"0\",le=\"0.3\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:request_time_per_output_token_seconds_bucket{engine=\"0\",le=\"0.4\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:request_time_per_output_token_seconds_bucket{engine=\"0\",le=\"0.5\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:request_time_per_output_token_seconds_bucket{engine=\"0\",le=\"0.75\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:request_time_per_output_token_seconds_bucket{engine=\"0\",le=\"1.0\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:request_time_per_output_token_seconds_bucket{engine=\"0\",le=\"2.5\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:request_time_per_output_token_seconds_bucket{engine=\"0\",le=\"5.0\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:request_time_per_output_token_seconds_bucket{engine=\"0\",le=\"7.5\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:request_time_per_output_token_seconds_bucket{engine=\"0\",le=\"10.0\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:request_time_per_output_token_seconds_bucket{engine=\"0\",le=\"20.0\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:request_time_per_output_token_seconds_bucket{engine=\"0\",le=\"40.0\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:request_time_per_output_token_seconds_bucket{engine=\"0\",le=\"80.0\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:request_time_per_output_token_seconds_bucket{engine=\"0\",le=\"+Inf\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:request_time_per_output_token_seconds_count{engine=\"0\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:request_time_per_output_token_seconds_sum{engine=\"0\",model_name=\"openai/gpt-oss-20b\"} 3.4463175618247224\n# HELP vllm:request_time_per_output_token_seconds_created Histogram of time_per_output_token_seconds per request.\n# TYPE vllm:request_time_per_output_token_seconds_created gauge\nvllm:request_time_per_output_token_seconds_created{engine=\"0\",model_name=\"openai/gpt-oss-20b\"} 1.7877735588162408e+09\n# HELP vllm:e2e_request_latency_seconds Histogram of e2e request latency in seconds.\n# TYPE vllm:e2e_request_latency_seconds histogram\nvllm:e2e_request_latency_seconds_bucket{engine=\"0\",le=\"0.3\",model_name=\"openai/gpt-oss-20b\"} 18.0\nvllm:e2e_request_latency_seconds_bucket{engine=\"0\",le=\"0.5\",model_name=\"openai/gpt-oss-20b\"} 34.0\nvllm:e2e_request_latency_seconds_bucket{engine=\"0\",le=\"0.8\",model_name=\"openai/gpt-oss-20b\"} 34.0\nvllm:e2e_request_latency_seconds_bucket{engine=\"0\",le=\"1.0\",model_name=\"openai/gpt-oss-20b\"} 34.0\nvllm:e2e_request_latency_seconds_bucket{engine=\"0\",le=\"1.5\",model_name=\"openai/gpt-oss-20b\"} 34.0\nvllm:e2e_request_latency_seconds_bucket{engine=\"0\",le=\"2.0\",model_name=\"openai/gpt-oss-20b\"} 34.0\nvllm:e2e_request_latency_seconds_bucket{engine=\"0\",le=\"2.5\",model_name=\"openai/gpt-oss-20b\"} 34.0\nvllm:e2e_request_latency_seconds_bucket{engine=\"0\",le=\"5.0\",model_name=\"openai/gpt-oss-20b\"} 88.0\nvllm:e2e_request_latency_seconds_bucket{engine=\"0\",le=\"10.0\",model_name=\"openai/gpt-oss-20b\"} 223.0\nvllm:e2e_request_latency_seconds_bucket{engine=\"0\",le=\"15.0\",model_name=\"openai/gpt-oss-20b\"} 272.0\nvllm:e2e_request_latency_seconds_bucket{engine=\"0\",le=\"20.0\",model_name=\"openai/gpt-oss-20b\"} 280.0\nvllm:e2e_request_latency_seconds_bucket{engine=\"0\",le=\"30.0\",model_name=\"openai/gpt-oss-20b\"} 284.0\nvllm:e2e_request_latency_seconds_bucket{engine=\"0\",le=\"40.0\",model_name=\"openai/gpt-oss-20b\"} 348.0\nvllm:e2e_request_latency_seconds_bucket{engine=\"0\",le=\"50.0\",model_name=\"openai/gpt-oss-20b\"} 364.0\nvllm:e2e_request_latency_seconds_bucket{engine=\"0\",le=\"60.0\",model_name=\"openai/gpt-oss-20b\"} 460.0\nvllm:e2e_request_latency_seconds_bucket{engine=\"0\",le=\"120.0\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:e2e_request_latency_seconds_bucket{engine=\"0\",le=\"240.0\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:e2e_request_latency_seconds_bucket{engine=\"0\",le=\"480.0\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:e2e_request_latency_seconds_bucket{engine=\"0\",le=\"960.0\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:e2e_request_latency_seconds_bucket{engine=\"0\",le=\"1920.0\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:e2e_request_latency_seconds_bucket{engine=\"0\",le=\"7680.0\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:e2e_request_latency_seconds_bucket{engine=\"0\",le=\"+Inf\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:e2e_request_latency_seconds_count{engine=\"0\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:e2e_request_latency_seconds_sum{engine=\"0\",model_name=\"openai/gpt-oss-20b\"} 15065.52882862091\n# HELP vllm:e2e_request_latency_seconds_created Histogram of e2e request latency in seconds.\n# TYPE vllm:e2e_request_latency_seconds_created gauge\nvllm:e2e_request_latency_seconds_created{engine=\"0\",model_name=\"openai/gpt-oss-20b\"} 1.7877735588163762e+09\n# HELP vllm:request_queue_time_seconds Histogram of time spent in WAITING phase for request.\n# TYPE vllm:request_queue_time_seconds histogram\nvllm:request_queue_time_seconds_bucket{engine=\"0\",le=\"0.3\",model_name=\"openai/gpt-oss-20b\"} 398.0\nvllm:request_queue_time_seconds_bucket{engine=\"0\",le=\"0.5\",model_name=\"openai/gpt-oss-20b\"} 434.0\nvllm:request_queue_time_seconds_bucket{engine=\"0\",le=\"0.8\",model_name=\"openai/gpt-oss-20b\"} 452.0\nvllm:request_queue_time_seconds_bucket{engine=\"0\",le=\"1.0\",model_name=\"openai/gpt-oss-20b\"} 468.0\nvllm:request_queue_time_seconds_bucket{engine=\"0\",le=\"1.5\",model_name=\"openai/gpt-oss-20b\"} 484.0\nvllm:request_queue_time_seconds_bucket{engine=\"0\",le=\"2.0\",model_name=\"openai/gpt-oss-20b\"} 496.0\nvllm:request_queue_time_seconds_bucket{engine=\"0\",le=\"2.5\",model_name=\"openai/gpt-oss-20b\"} 504.0\nvllm:request_queue_time_seconds_bucket{engine=\"0\",le=\"5.0\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:request_queue_time_seconds_bucket{engine=\"0\",le=\"10.0\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:request_queue_time_seconds_bucket{engine=\"0\",le=\"15.0\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:request_queue_time_seconds_bucket{engine=\"0\",le=\"20.0\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:request_queue_time_seconds_bucket{engine=\"0\",le=\"30.0\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:request_queue_time_seconds_bucket{engine=\"0\",le=\"40.0\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:request_queue_time_seconds_bucket{engine=\"0\",le=\"50.0\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:request_queue_time_seconds_bucket{engine=\"0\",le=\"60.0\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:request_queue_time_seconds_bucket{engine=\"0\",le=\"120.0\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:request_queue_time_seconds_bucket{engine=\"0\",le=\"240.0\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:request_queue_time_seconds_bucket{engine=\"0\",le=\"480.0\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:request_queue_time_seconds_bucket{engine=\"0\",le=\"960.0\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:request_queue_time_seconds_bucket{engine=\"0\",le=\"1920.0\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:request_queue_time_seconds_bucket{engine=\"0\",le=\"7680.0\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:request_queue_time_seconds_bucket{engine=\"0\",le=\"+Inf\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:request_queue_time_seconds_count{engine=\"0\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:request_queue_time_seconds_sum{engine=\"0\",model_name=\"openai/gpt-oss-20b\"} 185.92572855949402\n# HELP vllm:request_queue_time_seconds_created Histogram of time spent in WAITING phase for request.\n# TYPE vllm:request_queue_time_seconds_created gauge\nvllm:request_queue_time_seconds_created{engine=\"0\",model_name=\"openai/gpt-oss-20b\"} 1.787773558816517e+09\n# HELP vllm:request_inference_time_seconds Histogram of time spent in RUNNING phase for request.\n# TYPE vllm:request_inference_time_seconds histogram\nvllm:request_inference_time_seconds_bucket{engine=\"0\",le=\"0.3\",model_name=\"openai/gpt-oss-20b\"} 26.0\nvllm:request_inference_time_seconds_bucket{engine=\"0\",le=\"0.5\",model_name=\"openai/gpt-oss-20b\"} 34.0\nvllm:request_inference_time_seconds_bucket{engine=\"0\",le=\"0.8\",model_name=\"openai/gpt-oss-20b\"} 34.0\nvllm:request_inference_time_seconds_bucket{engine=\"0\",le=\"1.0\",model_name=\"openai/gpt-oss-20b\"} 34.0\nvllm:request_inference_time_seconds_bucket{engine=\"0\",le=\"1.5\",model_name=\"openai/gpt-oss-20b\"} 34.0\nvllm:request_inference_time_seconds_bucket{engine=\"0\",le=\"2.0\",model_name=\"openai/gpt-oss-20b\"} 34.0\nvllm:request_inference_time_seconds_bucket{engine=\"0\",le=\"2.5\",model_name=\"openai/gpt-oss-20b\"} 34.0\nvllm:request_inference_time_seconds_bucket{engine=\"0\",le=\"5.0\",model_name=\"openai/gpt-oss-20b\"} 88.0\nvllm:request_inference_time_seconds_bucket{engine=\"0\",le=\"10.0\",model_name=\"openai/gpt-oss-20b\"} 226.0\nvllm:request_inference_time_seconds_bucket{engine=\"0\",le=\"15.0\",model_name=\"openai/gpt-oss-20b\"} 280.0\nvllm:request_inference_time_seconds_bucket{engine=\"0\",le=\"20.0\",model_name=\"openai/gpt-oss-20b\"} 280.0\nvllm:request_inference_time_seconds_bucket{engine=\"0\",le=\"30.0\",model_name=\"openai/gpt-oss-20b\"} 284.0\nvllm:request_inference_time_seconds_bucket{engine=\"0\",le=\"40.0\",model_name=\"openai/gpt-oss-20b\"} 348.0\nvllm:request_inference_time_seconds_bucket{engine=\"0\",le=\"50.0\",model_name=\"openai/gpt-oss-20b\"} 364.0\nvllm:request_inference_time_seconds_bucket{engine=\"0\",le=\"60.0\",model_name=\"openai/gpt-oss-20b\"} 460.0\nvllm:request_inference_time_seconds_bucket{engine=\"0\",le=\"120.0\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:request_inference_time_seconds_bucket{engine=\"0\",le=\"240.0\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:request_inference_time_seconds_bucket{engine=\"0\",le=\"480.0\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:request_inference_time_seconds_bucket{engine=\"0\",le=\"960.0\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:request_inference_time_seconds_bucket{engine=\"0\",le=\"1920.0\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:request_inference_time_seconds_bucket{engine=\"0\",le=\"7680.0\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:request_inference_time_seconds_bucket{engine=\"0\",le=\"+Inf\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:request_inference_time_seconds_count{engine=\"0\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:request_inference_time_seconds_sum{engine=\"0\",model_name=\"openai/gpt-oss-20b\"} 14845.288041984662\n# HELP vllm:request_inference_time_seconds_created Histogram of time spent in RUNNING phase for request.\n# TYPE vllm:request_inference_time_seconds_created gauge\nvllm:request_inference_time_seconds_created{engine=\"0\",model_name=\"openai/gpt-oss-20b\"} 1.7877735588166692e+09\n# HELP vllm:request_prefill_time_seconds Histogram of time spent in PREFILL phase for request.\n# TYPE vllm:request_prefill_time_seconds histogram\nvllm:request_prefill_time_seconds_bucket{engine=\"0\",le=\"0.3\",model_name=\"openai/gpt-oss-20b\"} 250.0\nvllm:request_prefill_time_seconds_bucket{engine=\"0\",le=\"0.5\",model_name=\"openai/gpt-oss-20b\"} 460.0\nvllm:request_prefill_time_seconds_bucket{engine=\"0\",le=\"0.8\",model_name=\"openai/gpt-oss-20b\"} 490.0\nvllm:request_prefill_time_seconds_bucket{engine=\"0\",le=\"1.0\",model_name=\"openai/gpt-oss-20b\"} 506.0\nvllm:request_prefill_time_seconds_bucket{engine=\"0\",le=\"1.5\",model_name=\"openai/gpt-oss-20b\"} 507.0\nvllm:request_prefill_time_seconds_bucket{engine=\"0\",le=\"2.0\",model_name=\"openai/gpt-oss-20b\"} 507.0\nvllm:request_prefill_time_seconds_bucket{engine=\"0\",le=\"2.5\",model_name=\"openai/gpt-oss-20b\"} 522.0\nvllm:request_prefill_time_seconds_bucket{engine=\"0\",le=\"5.0\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:request_prefill_time_seconds_bucket{engine=\"0\",le=\"10.0\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:request_prefill_time_seconds_bucket{engine=\"0\",le=\"15.0\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:request_prefill_time_seconds_bucket{engine=\"0\",le=\"20.0\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:request_prefill_time_seconds_bucket{engine=\"0\",le=\"30.0\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:request_prefill_time_seconds_bucket{engine=\"0\",le=\"40.0\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:request_prefill_time_seconds_bucket{engine=\"0\",le=\"50.0\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:request_prefill_time_seconds_bucket{engine=\"0\",le=\"60.0\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:request_prefill_time_seconds_bucket{engine=\"0\",le=\"120.0\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:request_prefill_time_seconds_bucket{engine=\"0\",le=\"240.0\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:request_prefill_time_seconds_bucket{engine=\"0\",le=\"480.0\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:request_prefill_time_seconds_bucket{engine=\"0\",le=\"960.0\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:request_prefill_time_seconds_bucket{engine=\"0\",le=\"1920.0\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:request_prefill_time_seconds_bucket{engine=\"0\",le=\"7680.0\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:request_prefill_time_seconds_bucket{engine=\"0\",le=\"+Inf\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:request_prefill_time_seconds_count{engine=\"0\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:request_prefill_time_seconds_sum{engine=\"0\",model_name=\"openai/gpt-oss-20b\"} 196.43994908966124\n# HELP vllm:request_prefill_time_seconds_created Histogram of time spent in PREFILL phase for request.\n# TYPE vllm:request_prefill_time_seconds_created gauge\nvllm:request_prefill_time_seconds_created{engine=\"0\",model_name=\"openai/gpt-oss-20b\"} 1.7877735588168058e+09\n# HELP vllm:request_decode_time_seconds Histogram of time spent in DECODE phase for request.\n# TYPE vllm:request_decode_time_seconds histogram\nvllm:request_decode_time_seconds_bucket{engine=\"0\",le=\"0.3\",model_name=\"openai/gpt-oss-20b\"} 36.0\nvllm:request_decode_time_seconds_bucket{engine=\"0\",le=\"0.5\",model_name=\"openai/gpt-oss-20b\"} 36.0\nvllm:request_decode_time_seconds_bucket{engine=\"0\",le=\"0.8\",model_name=\"openai/gpt-oss-20b\"} 36.0\nvllm:request_decode_time_seconds_bucket{engine=\"0\",le=\"1.0\",model_name=\"openai/gpt-oss-20b\"} 36.0\nvllm:request_decode_time_seconds_bucket{engine=\"0\",le=\"1.5\",model_name=\"openai/gpt-oss-20b\"} 36.0\nvllm:request_decode_time_seconds_bucket{engine=\"0\",le=\"2.0\",model_name=\"openai/gpt-oss-20b\"} 36.0\nvllm:request_decode_time_seconds_bucket{engine=\"0\",le=\"2.5\",model_name=\"openai/gpt-oss-20b\"} 36.0\nvllm:request_decode_time_seconds_bucket{engine=\"0\",le=\"5.0\",model_name=\"openai/gpt-oss-20b\"} 103.0\nvllm:request_decode_time_seconds_bucket{engine=\"0\",le=\"10.0\",model_name=\"openai/gpt-oss-20b\"} 229.0\nvllm:request_decode_time_seconds_bucket{engine=\"0\",le=\"15.0\",model_name=\"openai/gpt-oss-20b\"} 280.0\nvllm:request_decode_time_seconds_bucket{engine=\"0\",le=\"20.0\",model_name=\"openai/gpt-oss-20b\"} 280.0\nvllm:request_decode_time_seconds_bucket{engine=\"0\",le=\"30.0\",model_name=\"openai/gpt-oss-20b\"} 284.0\nvllm:request_decode_time_seconds_bucket{engine=\"0\",le=\"40.0\",model_name=\"openai/gpt-oss-20b\"} 348.0\nvllm:request_decode_time_seconds_bucket{engine=\"0\",le=\"50.0\",model_name=\"openai/gpt-oss-20b\"} 364.0\nvllm:request_decode_time_seconds_bucket{engine=\"0\",le=\"60.0\",model_name=\"openai/gpt-oss-20b\"} 460.0\nvllm:request_decode_time_seconds_bucket{engine=\"0\",le=\"120.0\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:request_decode_time_seconds_bucket{engine=\"0\",le=\"240.0\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:request_decode_time_seconds_bucket{engine=\"0\",le=\"480.0\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:request_decode_time_seconds_bucket{engine=\"0\",le=\"960.0\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:request_decode_time_seconds_bucket{engine=\"0\",le=\"1920.0\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:request_decode_time_seconds_bucket{engine=\"0\",le=\"7680.0\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:request_decode_time_seconds_bucket{engine=\"0\",le=\"+Inf\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:request_decode_time_seconds_count{engine=\"0\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:request_decode_time_seconds_sum{engine=\"0\",model_name=\"openai/gpt-oss-20b\"} 14648.848092895001\n# HELP vllm:request_decode_time_seconds_created Histogram of time spent in DECODE phase for request.\n# TYPE vllm:request_decode_time_seconds_created gauge\nvllm:request_decode_time_seconds_created{engine=\"0\",model_name=\"openai/gpt-oss-20b\"} 1.787773558816943e+09\n# HELP vllm:request_prefill_kv_computed_tokens Histogram of new KV tokens computed during prefill (excluding cached tokens).\n# TYPE vllm:request_prefill_kv_computed_tokens histogram\nvllm:request_prefill_kv_computed_tokens_bucket{engine=\"0\",le=\"1.0\",model_name=\"openai/gpt-oss-20b\"} 0.0\nvllm:request_prefill_kv_computed_tokens_bucket{engine=\"0\",le=\"2.0\",model_name=\"openai/gpt-oss-20b\"} 0.0\nvllm:request_prefill_kv_computed_tokens_bucket{engine=\"0\",le=\"5.0\",model_name=\"openai/gpt-oss-20b\"} 0.0\nvllm:request_prefill_kv_computed_tokens_bucket{engine=\"0\",le=\"10.0\",model_name=\"openai/gpt-oss-20b\"} 0.0\nvllm:request_prefill_kv_computed_tokens_bucket{engine=\"0\",le=\"20.0\",model_name=\"openai/gpt-oss-20b\"} 0.0\nvllm:request_prefill_kv_computed_tokens_bucket{engine=\"0\",le=\"50.0\",model_name=\"openai/gpt-oss-20b\"} 0.0\nvllm:request_prefill_kv_computed_tokens_bucket{engine=\"0\",le=\"100.0\",model_name=\"openai/gpt-oss-20b\"} 0.0\nvllm:request_prefill_kv_computed_tokens_bucket{engine=\"0\",le=\"200.0\",model_name=\"openai/gpt-oss-20b\"} 0.0\nvllm:request_prefill_kv_computed_tokens_bucket{engine=\"0\",le=\"500.0\",model_name=\"openai/gpt-oss-20b\"} 0.0\nvllm:request_prefill_kv_computed_tokens_bucket{engine=\"0\",le=\"1000.0\",model_name=\"openai/gpt-oss-20b\"} 0.0\nvllm:request_prefill_kv_computed_tokens_bucket{engine=\"0\",le=\"2000.0\",model_name=\"openai/gpt-oss-20b\"} 262.0\nvllm:request_prefill_kv_computed_tokens_bucket{engine=\"0\",le=\"5000.0\",model_name=\"openai/gpt-oss-20b\"} 262.0\nvllm:request_prefill_kv_computed_tokens_bucket{engine=\"0\",le=\"10000.0\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:request_prefill_kv_computed_tokens_bucket{engine=\"0\",le=\"20000.0\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:request_prefill_kv_computed_tokens_bucket{engine=\"0\",le=\"+Inf\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:request_prefill_kv_computed_tokens_count{engine=\"0\",model_name=\"openai/gpt-oss-20b\"} 524.0\nvllm:request_prefill_kv_computed_tokens_sum{engine=\"0\",model_name=\"openai/gpt-oss-20b\"} 2.414592e+06\n# HELP vllm:request_prefill_kv_computed_tokens_created Histogram of new KV tokens computed during prefill (excluding cached tokens).\n# TYPE vllm:request_prefill_kv_computed_tokens_created gauge\nvllm:request_prefill_kv_computed_tokens_created{engine=\"0\",model_name=\"openai/gpt-oss-20b\"} 1.7877735588170786e+09\n# HELP vllm:cache_config_info Information of the LLMEngine CacheConfig\n# TYPE vllm:cache_config_info gauge\nvllm:cache_config_info{_block_size_resolved=\"True\",block_size=\"16\",cache_dtype=\"auto\",enable_prefix_caching=\"False\",engine=\"0\",gpu_memory_utilization=\"0.9\",is_attention_free=\"False\",kv_cache_dtype_skip_layers=\"[]\",kv_cache_max_concurrency=\"63.79544459045116\",kv_cache_memory_bytes=\"None\",kv_cache_size_tokens=\"1275908\",kv_offloading_backend=\"native\",kv_offloading_size=\"None\",kv_sharing_fast_prefill=\"False\",mamba_block_size=\"None\",mamba_cache_dtype=\"auto\",mamba_cache_mode=\"none\",mamba_page_size_padded=\"None\",mamba_ssm_cache_dtype=\"auto\",num_cpu_blocks=\"None\",num_gpu_blocks=\"145645\",num_gpu_blocks_override=\"None\",prefix_caching_hash_algo=\"sha256\",prefix_match_unit=\"None\",replayssm_buffer_len=\"16\",skip_page_size_padded=\"None\",sliding_window=\"None\",use_replayssm=\"False\",user_specified_block_size=\"False\",user_specified_mamba_block_size=\"False\"} 1.0\n# HELP http_requests_total Total number of requests by method, status and handler.\n# TYPE http_requests_total counter\nhttp_requests_total{handler=\"/v1/completions\",method=\"POST\",status=\"2xx\"} 524.0\n# HELP http_requests_created Total number of requests by method, status and handler.\n# TYPE http_requests_created gauge\nhttp_requests_created{handler=\"/v1/completions\",method=\"POST\",status=\"2xx\"} 1.787773579587231e+09\n# HELP http_request_size_bytes Content length of incoming requests by handler. Only value of header is respected. Otherwise ignored. No percentile calculated. \n# TYPE http_request_size_bytes summary\nhttp_request_size_bytes_count{handler=\"/v1/completions\"} 524.0\nhttp_request_size_bytes_sum{handler=\"/v1/completions\"} 1.5713044e+07\n# HELP http_request_size_bytes_created Content length of incoming requests by handler. Only value of header is respected. Otherwise ignored. No percentile calculated. \n# TYPE http_request_size_bytes_created gauge\nhttp_request_size_bytes_created{handler=\"/v1/completions\"} 1.7877735795872655e+09\n# HELP http_response_size_bytes Content length of outgoing responses by handler. Only value of header is respected. Otherwise ignored. No percentile calculated. \n# TYPE http_response_size_bytes summary\nhttp_response_size_bytes_count{handler=\"/v1/completions\"} 524.0\nhttp_response_size_bytes_sum{handler=\"/v1/completions\"} 0.0\n# HELP http_response_size_bytes_created Content length of outgoing responses by handler. Only value of header is respected. Otherwise ignored. No percentile calculated. \n# TYPE http_response_size_bytes_created gauge\nhttp_response_size_bytes_created{handler=\"/v1/completions\"} 1.7877735795873067e+09\n# HELP http_request_duration_highr_seconds Latency with many buckets but no API specific labels. Made for more accurate percentile calculations. \n# TYPE http_request_duration_highr_seconds histogram\nhttp_request_duration_highr_seconds_bucket{le=\"0.01\"} 0.0\nhttp_request_duration_highr_seconds_bucket{le=\"0.025\"} 0.0\nhttp_request_duration_highr_seconds_bucket{le=\"0.05\"} 0.0\nhttp_request_duration_highr_seconds_bucket{le=\"0.075\"} 0.0\nhttp_request_duration_highr_seconds_bucket{le=\"0.1\"} 1.0\nhttp_request_duration_highr_seconds_bucket{le=\"0.25\"} 18.0\nhttp_request_duration_highr_seconds_bucket{le=\"0.5\"} 34.0\nhttp_request_duration_highr_seconds_bucket{le=\"0.75\"} 34.0\nhttp_request_duration_highr_seconds_bucket{le=\"1.0\"} 34.0\nhttp_request_duration_highr_seconds_bucket{le=\"1.5\"} 34.0\nhttp_request_duration_highr_seconds_bucket{le=\"2.0\"} 34.0\nhttp_request_duration_highr_seconds_bucket{le=\"2.5\"} 34.0\nhttp_request_duration_highr_seconds_bucket{le=\"3.0\"} 34.0\nhttp_request_duration_highr_seconds_bucket{le=\"3.5\"} 40.0\nhttp_request_duration_highr_seconds_bucket{le=\"4.0\"} 44.0\nhttp_request_duration_highr_seconds_bucket{le=\"4.5\"} 44.0\nhttp_request_duration_highr_seconds_bucket{le=\"5.0\"} 88.0\nhttp_request_duration_highr_seconds_bucket{le=\"7.5\"} 188.0\nhttp_request_duration_highr_seconds_bucket{le=\"10.0\"} 223.0\nhttp_request_duration_highr_seconds_bucket{le=\"30.0\"} 284.0\nhttp_request_duration_highr_seconds_bucket{le=\"60.0\"} 460.0\nhttp_request_duration_highr_seconds_bucket{le=\"+Inf\"} 524.0\nhttp_request_duration_highr_seconds_count 524.0\nhttp_request_duration_highr_seconds_sum 15077.450041826814\n# HELP http_request_duration_highr_seconds_created Latency with many buckets but no API specific labels. Made for more accurate percentile calculations. \n# TYPE http_request_duration_highr_seconds_created gauge\nhttp_request_duration_highr_seconds_created 1.7877735589937687e+09\n# HELP http_request_duration_seconds Latency with only few buckets by handler. Made to be only used if aggregation by handler is important. \n# TYPE http_request_duration_seconds histogram\nhttp_request_duration_seconds_bucket{handler=\"/v1/completions\",le=\"0.1\",method=\"POST\"} 1.0\nhttp_request_duration_seconds_bucket{handler=\"/v1/completions\",le=\"0.5\",method=\"POST\"} 34.0\nhttp_request_duration_seconds_bucket{handler=\"/v1/completions\",le=\"1.0\",method=\"POST\"} 34.0\nhttp_request_duration_seconds_bucket{handler=\"/v1/completions\",le=\"+Inf\",method=\"POST\"} 524.0\nhttp_request_duration_seconds_count{handler=\"/v1/completions\",method=\"POST\"} 524.0\nhttp_request_duration_seconds_sum{handler=\"/v1/completions\",method=\"POST\"} 15077.450041826814\n# HELP http_request_duration_seconds_created Latency with only few buckets by handler. Made to be only used if aggregation by handler is important. \n# TYPE http_request_duration_seconds_created gauge\nhttp_request_duration_seconds_created{handler=\"/v1/completions\",method=\"POST\"} 1.7877735795873501e+09\n"
+  }
+}
