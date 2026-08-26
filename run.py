@@ -48,6 +48,13 @@ MODELS = {
         "gpu_mem_util": 0.92,
         "min_gpu_gb": 80,
     },
+    # dense 8B for Config E (CPU prefill): MoE MXFP4 has no CPU kernels; a dense
+    # 8B in bf16 is the plan's Tier-1 CPU-prefill target and runs on the GPU too.
+    "qwen3-8b": {
+        "hf": "Qwen/Qwen3-8B",
+        "gpu_mem_util": 0.85,
+        "min_gpu_gb": 20,
+    },
     # a tiny open model for local smoke tests of the harness itself (no gpt-oss)
     "qwen3-0.6b": {
         "hf": "Qwen/Qwen3-0.6B",
