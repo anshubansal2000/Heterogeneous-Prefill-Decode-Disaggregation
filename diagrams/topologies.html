@@ -1,0 +1,201 @@
+<meta charset="utf-8">
+<title>PD Disaggregation Topologies</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  body{margin:0;background:#F7F8F6;color:#1B1F2A;font-family:"IBM Plex Sans",system-ui,sans-serif}
+  .page{max-width:1040px;margin:0 auto;padding:28px 24px 60px}
+  h2{font-size:1.15rem;margin:34px 0 4px}
+  .sub{color:#5C6370;font-size:.9rem;margin:0 0 10px}
+  figure{margin:0 0 8px}
+  svg{max-width:100%;height:auto;display:block}
+  .mono{font-family:"IBM Plex Mono",monospace}
+  .cap{font-size:.82rem;color:#5C6370;line-height:1.5}
+  text{font-family:"IBM Plex Sans",system-ui,sans-serif}
+</style>
+<div class="page">
+
+<h2>A · Our setup — single node (Config E): CPU prefill → GPU decode</h2>
+<p class="sub">One pod. KV never leaves the box: DRAM → PCIe → HBM. No NIC, no KV store, no cluster.</p>
+<figure>
+<svg viewBox="0 0 940 300" role="img" aria-label="Single node with a CPU prefill engine holding model weights in DRAM and producing KV in DRAM, connected over PCIe to a GPU decode engine holding a second copy of the model weights in HBM. The KV cache moves from DRAM over PCIe into HBM. No network is involved.">
+  <defs>
+    <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#B45309"/></marker>
+    <marker id="arg" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#5C6370"/></marker>
+  </defs>
+  <!-- outer node -->
+  <rect x="30" y="60" width="880" height="210" rx="12" fill="none" stroke="#1B1F2A" stroke-width="1.5"/>
+  <text x="48" y="50" font-size="14" font-weight="600">1 pod / 1 node</text>
+  <!-- request in -->
+  <text x="18" y="120" font-size="12" fill="#5C6370">request ►</text>
+  <!-- CPU prefill -->
+  <rect x="60" y="82" width="360" height="166" rx="10" fill="#0F766E" fill-opacity=".08" stroke="#0F766E" stroke-width="2"/>
+  <text x="240" y="108" text-anchor="middle" font-size="15" font-weight="700" fill="#0F766E">CPU — Prefill engine</text>
+  <text x="240" y="128" text-anchor="middle" font-size="12">vLLM CPU backend · kv_role=producer</text>
+  <rect x="82" y="142" width="316" height="42" rx="6" fill="#fff" stroke="#0F766E" stroke-opacity=".4"/>
+  <text x="240" y="160" text-anchor="middle" font-size="12" font-weight="600">model weights in DRAM</text>
+  <text x="240" y="176" text-anchor="middle" font-size="11" fill="#5C6370" class="mono">e.g. ~60 GB (gpt-oss-120B MXFP4)</text>
+  <rect x="82" y="194" width="316" height="38" rx="6" fill="#B45309" fill-opacity=".1" stroke="#B45309" stroke-opacity=".5"/>
+  <text x="240" y="217" text-anchor="middle" font-size="12" font-weight="600" fill="#B45309">KV cache born here (in DRAM)</text>
+  <!-- PCIe arrow -->
+  <line x1="420" y1="165" x2="520" y2="165" stroke="#B45309" stroke-width="2.5" marker-end="url(#ar)"/>
+  <text x="470" y="152" text-anchor="middle" font-size="12" font-weight="600" fill="#B45309">KV</text>
+  <text x="470" y="188" text-anchor="middle" font-size="11" fill="#5C6370">DRAM→PCIe→HBM</text>
+  <text x="470" y="203" text-anchor="middle" font-size="10.5" fill="#5C6370" class="mono">~25–50 GB/s · no NIC</text>
+  <!-- GPU decode -->
+  <rect x="520" y="82" width="360" height="166" rx="10" fill="#2a78d6" fill-opacity=".08" stroke="#2a78d6" stroke-width="2"/>
+  <text x="700" y="108" text-anchor="middle" font-size="15" font-weight="700" fill="#1c5cab">GPU — Decode engine</text>
+  <text x="700" y="128" text-anchor="middle" font-size="12">vLLM GPU · kv_role=consumer</text>
+  <rect x="542" y="142" width="316" height="42" rx="6" fill="#fff" stroke="#2a78d6" stroke-opacity=".4"/>
+  <text x="700" y="160" text-anchor="middle" font-size="12" font-weight="600">2nd copy of weights in HBM</text>
+  <text x="700" y="176" text-anchor="middle" font-size="11" fill="#5C6370" class="mono">~60 GB HBM (1× 80 GB GPU)</text>
+  <rect x="542" y="194" width="316" height="38" rx="6" fill="#2a78d6" fill-opacity=".1" stroke="#2a78d6" stroke-opacity=".5"/>
+  <text x="700" y="217" text-anchor="middle" font-size="12" font-weight="600" fill="#1c5cab">receives KV → generates tokens ►</text>
+  <!-- token out -->
+  <text x="884" y="120" font-size="12" fill="#5C6370">► tokens</text>
+</svg>
+<figcaption class="cap"><b>Note the model is loaded twice</b> — once in CPU DRAM (prefill), once in GPU HBM (decode). Only the KV cache travels between them, over PCIe. This is the whole experiment on one machine: no networking, no shared store.</figcaption>
+</figure>
+
+<h2>B · Production scale-out: pools of CPU prefill + Mooncake Store/TE + pool of decode GPUs</h2>
+<p class="sub">Prefill and decode are separate autoscaled fleets, connected by a shared KV pool over a network fabric. Ratios (N prefill : M decode) are tuned to traffic.</p>
+<figure>
+<svg viewBox="0 0 1000 560" role="img" aria-label="A router fans requests to a pool of CPU prefill nodes on the left, each holding model weights in DRAM. They push KV cache blocks into a central Mooncake Store, a shared KV pool in DRAM and SSD, moved by a Transfer Engine over RDMA or TCP. A pool of decode GPUs on the right, each holding model weights in HBM, pull KV from the store and generate tokens. Prefill and decode fleets scale independently.">
+  <defs>
+    <marker id="a1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#5C6370"/></marker>
+    <marker id="a1t" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#0F766E"/></marker>
+    <marker id="a1b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#2a78d6"/></marker>
+    <marker id="a1a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#B45309"/></marker>
+  </defs>
+  <!-- router -->
+  <rect x="360" y="24" width="280" height="52" rx="10" fill="none" stroke="#1B1F2A" stroke-width="1.5"/>
+  <text x="500" y="46" text-anchor="middle" font-size="14" font-weight="700">Disagg router / proxy</text>
+  <text x="500" y="64" text-anchor="middle" font-size="11" fill="#5C6370">routes prefill→P pool, decode→D pool</text>
+
+  <!-- prefill pool -->
+  <text x="150" y="112" text-anchor="middle" font-size="13" font-weight="700" fill="#0F766E">CPU PREFILL POOL — N nodes</text>
+  <g>
+    <rect x="40" y="126" width="220" height="58" rx="8" fill="#0F766E" fill-opacity=".08" stroke="#0F766E" stroke-width="1.6"/>
+    <text x="150" y="148" text-anchor="middle" font-size="12" font-weight="600">CPU prefill node #1</text>
+    <text x="150" y="166" text-anchor="middle" font-size="10.5" fill="#5C6370" class="mono">weights in DRAM · dual-socket</text>
+    <rect x="40" y="192" width="220" height="58" rx="8" fill="#0F766E" fill-opacity=".08" stroke="#0F766E" stroke-width="1.6"/>
+    <text x="150" y="214" text-anchor="middle" font-size="12" font-weight="600">CPU prefill node #2</text>
+    <text x="150" y="232" text-anchor="middle" font-size="10.5" fill="#5C6370" class="mono">weights in DRAM · NUMA-pinned</text>
+    <rect x="40" y="258" width="220" height="58" rx="8" fill="#0F766E" fill-opacity=".05" stroke="#0F766E" stroke-width="1.4" stroke-dasharray="5 4"/>
+    <text x="150" y="284" text-anchor="middle" font-size="12" font-weight="600" fill="#0F766E">… node #N</text>
+    <text x="150" y="301" text-anchor="middle" font-size="10.5" fill="#5C6370">scale for prefill compute</text>
+  </g>
+  <!-- router to prefill -->
+  <line x1="430" y1="76" x2="200" y2="122" stroke="#5C6370" stroke-width="1.4" marker-end="url(#a1)"/>
+
+  <!-- Mooncake store (center) -->
+  <rect x="330" y="150" width="340" height="220" rx="12" fill="#B45309" fill-opacity=".08" stroke="#B45309" stroke-width="2"/>
+  <text x="500" y="178" text-anchor="middle" font-size="15" font-weight="700" fill="#B45309">Mooncake Store</text>
+  <text x="500" y="197" text-anchor="middle" font-size="11.5" fill="#5C6370">shared KV pool · DRAM + SSD across nodes</text>
+  <rect x="356" y="212" width="288" height="46" rx="7" fill="#fff" stroke="#B45309" stroke-opacity=".4"/>
+  <text x="500" y="231" text-anchor="middle" font-size="12" font-weight="600">KV blocks (pooled)</text>
+  <text x="500" y="248" text-anchor="middle" font-size="10.5" fill="#5C6370" class="mono">many producers · many consumers</text>
+  <rect x="356" y="268" width="288" height="82" rx="7" fill="#B45309" fill-opacity=".12" stroke="#B45309" stroke-opacity=".55"/>
+  <text x="500" y="291" text-anchor="middle" font-size="13" font-weight="700" fill="#B45309">Transfer Engine (TE)</text>
+  <text x="500" y="311" text-anchor="middle" font-size="11" fill="#1B1F2A">RDMA / TCP / NVLink · zero-copy</text>
+  <text x="500" y="329" text-anchor="middle" font-size="11" fill="#1B1F2A">topology-aware · multi-NIC striping</text>
+  <text x="500" y="344" text-anchor="middle" font-size="10.5" fill="#5C6370">the fabric that moves KV between fleets</text>
+
+  <!-- prefill -> store (push) -->
+  <line x1="260" y1="200" x2="328" y2="240" stroke="#0F766E" stroke-width="2" marker-end="url(#a1a)"/>
+  <text x="292" y="205" text-anchor="middle" font-size="11" font-weight="600" fill="#0F766E">push KV</text>
+
+  <!-- decode pool -->
+  <text x="850" y="112" text-anchor="middle" font-size="13" font-weight="700" fill="#1c5cab">GPU DECODE POOL — M GPUs</text>
+  <g>
+    <rect x="740" y="126" width="220" height="58" rx="8" fill="#2a78d6" fill-opacity=".08" stroke="#2a78d6" stroke-width="1.6"/>
+    <text x="850" y="148" text-anchor="middle" font-size="12" font-weight="600">GPU decode #1</text>
+    <text x="850" y="166" text-anchor="middle" font-size="10.5" fill="#5C6370" class="mono">weights in HBM</text>
+    <rect x="740" y="192" width="220" height="58" rx="8" fill="#2a78d6" fill-opacity=".08" stroke="#2a78d6" stroke-width="1.6"/>
+    <text x="850" y="214" text-anchor="middle" font-size="12" font-weight="600">GPU decode #2</text>
+    <text x="850" y="232" text-anchor="middle" font-size="10.5" fill="#5C6370" class="mono">weights in HBM</text>
+    <rect x="740" y="258" width="220" height="58" rx="8" fill="#2a78d6" fill-opacity=".05" stroke="#2a78d6" stroke-width="1.4" stroke-dasharray="5 4"/>
+    <text x="850" y="284" text-anchor="middle" font-size="12" font-weight="600" fill="#1c5cab">… GPU #M</text>
+    <text x="850" y="301" text-anchor="middle" font-size="10.5" fill="#5C6370">scale for decode throughput</text>
+  </g>
+  <!-- router to decode -->
+  <line x1="570" y1="76" x2="800" y2="122" stroke="#5C6370" stroke-width="1.4" marker-end="url(#a1)"/>
+  <!-- store -> decode (pull) -->
+  <line x1="672" y1="240" x2="740" y2="200" stroke="#2a78d6" stroke-width="2" marker-end="url(#a1b)"/>
+  <text x="708" y="205" text-anchor="middle" font-size="11" font-weight="600" fill="#1c5cab">pull KV</text>
+
+  <!-- tokens out -->
+  <text x="850" y="340" text-anchor="middle" font-size="11" fill="#5C6370">► tokens to users</text>
+
+  <!-- independent scaling note -->
+  <rect x="40" y="404" width="920" height="120" rx="10" fill="#EEF1EC" stroke="#E1E5E0"/>
+  <text x="60" y="430" font-size="13" font-weight="700">Why this shape at scale</text>
+  <text x="60" y="454" font-size="12" fill="#1B1F2A">• Prefill (compute-bound, bursty) and decode (bandwidth-bound, steady) are <tspan font-weight="600">separate fleets, scaled independently</tspan> — tune N:M to traffic.</text>
+  <text x="60" y="476" font-size="12" fill="#1B1F2A">• A <tspan font-weight="600" fill="#B45309">shared KV pool</tspan> (Mooncake Store) decouples producers from consumers; the <tspan font-weight="600" fill="#B45309">Transfer Engine</tspan> moves KV over RDMA/TCP with zero-copy.</text>
+  <text x="60" y="498" font-size="12" fill="#1B1F2A">• Very large / dense models: shard weights across <tspan font-weight="600" fill="#0F766E">multiple CPU nodes</tspan> for capacity + throughput. MoE (few active params) relaxes this.</text>
+  <text x="60" y="516" font-size="11.5" fill="#5C6370">We build (A) for the experiment; (B) is the production pattern we point at — one Mooncake-based config as the "at-scale" capstone.</text>
+</svg>
+<figcaption class="cap"><b>The Transfer Engine (TE)</b> is the transport layer beneath the store — it is what physically shuttles KV blocks between the CPU-prefill fleet and the GPU-decode fleet over the network fabric.</figcaption>
+</figure>
+
+<h2>C · Memory hierarchy — where "resident" means, and who fits where</h2>
+<p class="sub">"The model must be resident in RAM" = it must sit in <b>DRAM</b> (for CPU compute) or <b>HBM</b> (for GPU compute). SSD only stores it at rest. The CPU/GPU cannot compute out of SSD.</p>
+<figure>
+<svg viewBox="0 0 940 340" role="img" aria-label="A three-tier memory hierarchy. HBM on the GPU: 80 to 192 GB, about 3 to 5 TB/s, holds decode weights and KV, GPU computes here. DRAM attached to the CPU: 512 GB to 2 TB, about 200 to 500 GB/s, holds prefill weights and KV staging, CPU computes here. SSD or NVMe: terabytes, 1 to 7 GB/s, stores the model file at rest and optional KV spill; nothing computes here. The model is loaded from SSD up into DRAM and HBM at startup; KV flows from DRAM to HBM over PCIe.">
+  <defs>
+    <marker id="up" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#5C6370"/></marker>
+  </defs>
+  <!-- column headers -->
+  <text x="150" y="30" text-anchor="middle" font-size="12" font-weight="700" fill="#5C6370">TIER</text>
+  <text x="430" y="30" text-anchor="middle" font-size="12" font-weight="700" fill="#5C6370">CAPACITY</text>
+  <text x="600" y="30" text-anchor="middle" font-size="12" font-weight="700" fill="#5C6370">BANDWIDTH</text>
+  <text x="810" y="30" text-anchor="middle" font-size="12" font-weight="700" fill="#5C6370">COMPUTES HERE?</text>
+  <!-- HBM row (top = fastest) -->
+  <rect x="40" y="44" width="860" height="72" rx="9" fill="#2a78d6" fill-opacity=".1" stroke="#2a78d6" stroke-width="1.8"/>
+  <text x="150" y="74" text-anchor="middle" font-size="14" font-weight="700" fill="#1c5cab">HBM (on GPU)</text>
+  <text x="150" y="94" text-anchor="middle" font-size="11" fill="#5C6370">decode weights + KV</text>
+  <text x="430" y="80" text-anchor="middle" font-size="13" class="mono">80–192 GB</text>
+  <text x="600" y="80" text-anchor="middle" font-size="13" class="mono" fill="#1c5cab">~3–5 TB/s</text>
+  <text x="810" y="76" text-anchor="middle" font-size="12" font-weight="600" fill="#1c5cab">✓ GPU compute</text>
+  <text x="810" y="94" text-anchor="middle" font-size="10.5" fill="#5C6370">fastest, smallest</text>
+  <!-- DRAM row -->
+  <rect x="40" y="128" width="860" height="72" rx="9" fill="#0F766E" fill-opacity=".1" stroke="#0F766E" stroke-width="1.8"/>
+  <text x="150" y="158" text-anchor="middle" font-size="14" font-weight="700" fill="#0F766E">DRAM (CPU RAM)</text>
+  <text x="150" y="178" text-anchor="middle" font-size="11" fill="#5C6370">prefill weights + KV staging</text>
+  <text x="430" y="164" text-anchor="middle" font-size="13" class="mono">512 GB – 2 TB</text>
+  <text x="600" y="164" text-anchor="middle" font-size="13" class="mono" fill="#0F766E">~200–500 GB/s</text>
+  <text x="810" y="160" text-anchor="middle" font-size="12" font-weight="600" fill="#0F766E">✓ CPU compute</text>
+  <text x="810" y="178" text-anchor="middle" font-size="10.5" fill="#5C6370">DIMMs, not "in" the CPU</text>
+  <!-- SSD row (bottom = slowest/biggest) -->
+  <rect x="40" y="212" width="860" height="72" rx="9" fill="#EEF1EC" stroke="#1B1F2A" stroke-opacity=".35" stroke-width="1.5"/>
+  <text x="150" y="242" text-anchor="middle" font-size="14" font-weight="700">SSD / NVMe</text>
+  <text x="150" y="262" text-anchor="middle" font-size="11" fill="#5C6370">model file at rest · optional KV spill</text>
+  <text x="430" y="248" text-anchor="middle" font-size="13" class="mono">terabytes</text>
+  <text x="600" y="248" text-anchor="middle" font-size="13" class="mono" fill="#5C6370">~1–7 GB/s</text>
+  <text x="810" y="244" text-anchor="middle" font-size="12" font-weight="600" fill="#B45309">✗ never</text>
+  <text x="810" y="262" text-anchor="middle" font-size="10.5" fill="#5C6370">must load up to RAM first</text>
+  <!-- load arrows up -->
+  <line x1="60" y1="248" x2="60" y2="168" stroke="#5C6370" stroke-width="1.6" marker-end="url(#up)"/>
+  <line x1="60" y1="160" x2="60" y2="84" stroke="#5C6370" stroke-width="1.6" marker-end="url(#up)"/>
+  <text x="24" y="200" font-size="10.5" fill="#5C6370" transform="rotate(-90 24 200)">load at startup</text>
+  <!-- footnote -->
+  <text x="40" y="312" font-size="12" fill="#1B1F2A"><tspan font-weight="700">Rule:</tspan> a processor computes only on data in its own fast memory — <tspan font-weight="600" fill="#0F766E">CPU→DRAM</tspan>, <tspan font-weight="600" fill="#1c5cab">GPU→HBM</tspan>. Weights that don't fit must be sharded across more DRAM/HBM (more sockets/GPUs/nodes).</text>
+  <text x="40" y="330" font-size="11.5" fill="#5C6370">DRAM is not inside the CPU package — it is DIMM modules the CPU's memory controller addresses over 8–12 channels per socket.</text>
+</svg>
+</figure>
+
+<h3 style="font-size:1rem;margin:18px 0 4px">Who fits where (weights only — KV is on top)</h3>
+<div style="overflow-x:auto">
+<table style="border-collapse:collapse;font-size:.86rem;min-width:640px">
+  <tr style="text-align:left;color:#5C6370;border-bottom:2px solid #E1E5E0">
+    <th style="padding:.4rem .7rem">Model</th><th style="padding:.4rem .7rem">Precision</th>
+    <th style="padding:.4rem .7rem;text-align:right">Weight size</th><th style="padding:.4rem .7rem">Fits where</th></tr>
+  <tr style="border-bottom:1px solid #E1E5E0"><td style="padding:.35rem .7rem"><b>Llama-8B</b></td><td style="padding:.35rem .7rem">bf16</td><td style="padding:.35rem .7rem;text-align:right" class="mono">16 GB</td><td style="padding:.35rem .7rem">any node · 1 socket · 1 small GPU</td></tr>
+  <tr style="border-bottom:1px solid #E1E5E0;background:#EEF1EC"><td style="padding:.35rem .7rem"><b>gpt-oss-120B</b></td><td style="padding:.35rem .7rem">MXFP4 (4-bit)</td><td style="padding:.35rem .7rem;text-align:right" class="mono">~60 GB</td><td style="padding:.35rem .7rem"><b style="color:#0F766E">one socket's DRAM · one 80 GB GPU</b> — no multi-CPU needed</td></tr>
+  <tr style="border-bottom:1px solid #E1E5E0"><td style="padding:.35rem .7rem"><b>Llama-70B</b></td><td style="padding:.35rem .7rem">bf16</td><td style="padding:.35rem .7rem;text-align:right" class="mono">140 GB</td><td style="padding:.35rem .7rem">one dual-socket node · 2× 80 GB GPU</td></tr>
+  <tr style="border-bottom:1px solid #E1E5E0"><td style="padding:.35rem .7rem">Dense 405B</td><td style="padding:.35rem .7rem">4-bit</td><td style="padding:.35rem .7rem;text-align:right" class="mono">~200 GB</td><td style="padding:.35rem .7rem">one big node (1 TB RAM) · multi-GPU</td></tr>
+  <tr><td style="padding:.35rem .7rem">Dense 405B</td><td style="padding:.35rem .7rem">bf16</td><td style="padding:.35rem .7rem;text-align:right" class="mono">~810 GB</td><td style="padding:.35rem .7rem"><b style="color:#B45309">needs multiple nodes</b> (shard weights)</td></tr>
+</table>
+</div>
+<p class="cap" style="margin-top:8px"><b>Capacity</b> (does it fit?) is solved by quantization + enough DRAM/HBM; <b>throughput</b> (fast enough?) is where you add sockets/GPUs/nodes to parallelize. "Multiple CPUs" answers both — but they are separate reasons.</p>
+
+</div>

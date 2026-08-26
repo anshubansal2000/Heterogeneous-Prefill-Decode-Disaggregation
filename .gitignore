@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+.venv/
+results/*.server.log
+results/*.err
+*.pdf
+plan.txt
+# keep results/*.json and results/plots/*.png (they are the deliverable)
