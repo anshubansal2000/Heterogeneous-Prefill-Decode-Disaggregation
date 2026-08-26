@@ -49,6 +49,8 @@ class VLLMServer:
 
     def start(self) -> "VLLMServer":
         cmd = ["vllm", "serve", self.model, "--port", str(self.port)] + self.engine_args
+        if self.log_path:
+            os.makedirs(os.path.dirname(self.log_path) or ".", exist_ok=True)
         logf = open(self.log_path, "w") if self.log_path else subprocess.DEVNULL
         print("  launching:", " ".join(shlex.quote(c) for c in cmd), flush=True)
         self.proc = subprocess.Popen(cmd, stdout=logf, stderr=subprocess.STDOUT,

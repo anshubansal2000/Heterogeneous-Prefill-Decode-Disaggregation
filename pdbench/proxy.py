@@ -36,12 +36,13 @@ def _prefill_params() -> dict:
 
 
 def _decode_params(from_prefill: dict) -> dict:
-    p = {"do_remote_prefill": True}
-    # carry through whatever the prefill side handed back
-    for k in ("remote_engine_id", "remote_block_ids", "remote_host",
-              "remote_port", "remote_kv_url"):
-        if k in from_prefill:
-            p[k] = from_prefill[k]
+    # The prefill engine returns a COMPLETE kv_transfer_params (remote_engine_id,
+    # remote_block_ids, remote_request_id, remote_host/port, tp_size,
+    # remote_num_tokens, transfer_mode, ...) meant to be handed to the decode
+    # engine verbatim. Pass it through unchanged, just ensuring do_remote_prefill.
+    p = dict(from_prefill or {})
+    p["do_remote_prefill"] = True
+    p["do_remote_decode"] = False
     return p
 
 
@@ -53,6 +54,7 @@ async def handle_completions(request: web.Request) -> web.StreamResponse:
     pf["max_tokens"] = 1
     pf["min_tokens"] = 1
     pf["stream"] = False
+    pf.pop("stream_options", None)   # invalid when stream=False
     pf["kv_transfer_params"] = _prefill_params()
     r = await _client.post(PREFILL_URL + "/v1/completions", json=pf, timeout=600)
     if r.status_code != 200:
