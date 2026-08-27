@@ -256,6 +256,42 @@ pre{background:var(--panel);border:1px solid var(--line);border-radius:8px;paddi
   </div>
 </div></section>
 
+<section><div class="wide">
+  <span class="snum">AT SCALE</span>
+  <h2 style="max-width:760px">Why the big labs disaggregate anyway</h2>
+  <p class="wrap" style="padding:0;max-width:760px">Our headline result — disaggregation <em>lost</em> — sounds like it contradicts how frontier inference is built. It doesn't. Our test is the <b>control case that proves why their infrastructure exists</b>: same mechanism, no fast fabric, so it loses. The value is that it quantifies exactly how much overhead the fabric has to beat. Give the KV cache a fast enough wire and enough concurrency to hide behind, and the sign flips.</p>
+
+  <div class="panel" style="--k:var(--agg)">
+    <div class="ptitle">Same mechanism, opposite outcome — what changes is the environment</div>
+    <div class="psub">why disaggregation lost on our bench but wins at fleet scale</div>
+    <div class="tblwrap"><table>
+      <tr><th>Factor</th><th>Our benchmark (it lost)</th><th>Frontier-scale serving (it wins)</th></tr>
+      <tr><td>Interconnect</td><td>PCIe / host bridge — <b>no P2P</b>, ~2.4 s per KV transfer</td><td><b>NVLink/NVSwitch</b> in-node + <b>InfiniBand/RoCE RDMA</b> with GPUDirect between nodes</td></tr>
+      <tr><td>Concurrency</td><td>up to 32 — transfer is on the critical path</td><td>thousands — transfer <b>overlaps compute</b> and disappears under load</td></tr>
+      <tr><td>Fleets</td><td>2 GPUs, fixed roles</td><td>independent <b>prefill and decode pools</b>, autoscaled; P:D ratio tuned to traffic</td></tr>
+      <tr><td>Routing</td><td>round-robin</td><td><b>KV-cache-aware</b> — routes to the node already holding the prompt's prefix</td></tr>
+      <tr><td>KV path</td><td>point-to-point, host-staged</td><td><b>pooled distributed KV store</b> (DRAM/SSD tier) with prefix reuse</td></tr>
+    </table></div>
+    <div class="take"><b>Disaggregation is an interconnect bet.</b> The one thing that flips our result is a fast fabric — everything else is amplification.</div>
+  </div>
+
+  <div class="wrap" style="padding:0;max-width:760px">
+    <h3 style="margin-top:1.4rem">What they optimize</h3>
+    <ul class="tight">
+      <li><b>The interconnect, first.</b> KV moves GPU→GPU directly at hundreds of GB/s, so moving it is cheaper than the specialization is worth — the exact condition our host-staged link failed.</li>
+      <li><b>Independent scaling &amp; ratio tuning.</b> Long prompts → add prefill nodes; long generations → add decode nodes. You right-size each phase instead of buying GPUs that idle in one of them.</li>
+      <li><b>Prefix caching + KV-aware routing.</b> Most production prompts share prefixes (system prompts, RAG context, chat history). A router sends each request to the node that already has that KV — often skipping prefill entirely.</li>
+      <li><b>Chunked prefill + continuous batching.</b> Prefill is sliced to interleave with decode so neither phase stalls the pipeline, and the transfer is streamed layer-by-layer while decode starts.</li>
+      <li><b>Hardware specialization.</b> Compute-dense GPUs for prefill, bandwidth-dense GPUs for decode — each phase on the silicon it actually needs.</li>
+    </ul>
+  </div>
+
+  <div class="callout wrap" style="--k:var(--warn);max-width:760px">
+    <div class="h">What's public, and what isn't</div>
+    <b>Documented in the open:</b> DeepSeek's inference system and Moonshot AI's <b>Mooncake</b> (a KV-cache-centric <em>disaggregated</em> architecture) both describe production PD-disaggregation; the technique is now standard in vLLM, SGLang, NVIDIA Dynamo, and llm-d. <b>Closed:</b> OpenAI's and Anthropic's serving stacks are not publicly disclosed — so we can't confirm their internals. Given the economics and the shared open-source lineage, it is a reasonable inference that frontier labs run something in this family, but that is an inference, not a claim about their systems.
+  </div>
+</div></section>
+
 <section><div class="wrap">
   <span class="snum">METHOD</span>
   <h2>How to reproduce this</h2>
