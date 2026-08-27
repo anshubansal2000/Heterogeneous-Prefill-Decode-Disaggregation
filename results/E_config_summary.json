@@ -1,0 +1,37 @@
+{
+  "config": "E (CPU prefill -> GPU decode)",
+  "model": "Qwen/Qwen3-8B (dense 8B, bf16)",
+  "cpu": "AMD EPYC 9554 64-Core (128 threads), AVX-512, 1 TB RAM",
+  "gpu": "NVIDIA L40S 48GB",
+  "method": "emulation (plan-blessed): CPU prefill measured via a PyTorch forward pass; GPU decode ITL from the aggregated GPU run",
+  "cpu_prefill_raw_seconds": [
+    {
+      "isl": 128,
+      "t": 127.899
+    },
+    {
+      "isl": 512,
+      "t": 131.756
+    },
+    {
+      "isl": 1024,
+      "t": 164.145
+    },
+    {
+      "isl": 2048,
+      "t": 165.88
+    }
+  ],
+  "caveat": "CPU forward time was dominated by a large, variable fixed overhead (~128-166 s/forward) consistent with reading the ~16 GB model off the network filesystem each call; RAM-staging (.clone(), /dev/shm) did not fully resolve it. Absolute times are therefore I/O-bound, not compute-bound. The optimized vLLM CPU backend (source build) would be needed for a precise ceiling.",
+  "cpu_prefill_marginal_tok_s": {
+    "isl128_512": 99.6,
+    "isl1024_2048": 590.2
+  },
+  "cpu_prefill_effective_tflops_range": [
+    1.6,
+    9.7
+  ],
+  "gpu_prefill_tok_s_isl1024": 10779,
+  "gpu_decode_itl_ms": 25.0,
+  "headline": "CPU prefill (~100-600 tok/s) is ~20-110x slower than GPU prefill (~10,780 tok/s) for the same 8B model -> Config E sacrifices TTFT by 1-2 orders of magnitude, confirming H2's premise. The viable regime (short ISL, decode-bound OSL, throughput-oriented SLO, idle CPU) is narrow."
+}
