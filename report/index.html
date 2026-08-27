@@ -1,0 +1,379 @@
+<meta charset="utf-8">
+<title>Does Disaggregating Prefill Pay Off?</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --bg:#FCFCFD; --panel:#FFFFFF; --panel2:#F6F7F9; --ink:#14161B; --muted:#5A6472;
+  --line:#E4E7EC; --grid:#EDEFF2;
+  --agg:#2563EB; --agg-soft:#DCE6FD; --disagg:#C2620C; --disagg-soft:#FBEBD8;
+  --cpu:#0D9488; --cpu-soft:#D3EEEB; --warn:#DC2626; --ok:#0F9D58;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0E1116; --panel:#161A21; --panel2:#1B2029; --ink:#E7EAF0; --muted:#98A2B3;
+  --line:#262B34; --grid:#1E232C;
+  --agg:#5B92F5; --agg-soft:#16233C; --disagg:#E08A3C; --disagg-soft:#3A2812;
+  --cpu:#3FBFB0; --cpu-soft:#0F312E; --warn:#F26B6B; --ok:#43C084;
+}}
+:root[data-theme="dark"]{
+  --bg:#0E1116; --panel:#161A21; --panel2:#1B2029; --ink:#E7EAF0; --muted:#98A2B3;
+  --line:#262B34; --grid:#1E232C;
+  --agg:#5B92F5; --agg-soft:#16233C; --disagg:#E08A3C; --disagg-soft:#3A2812;
+  --cpu:#3FBFB0; --cpu-soft:#0F312E; --warn:#F26B6B; --ok:#43C084;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:16.5px;line-height:1.6;-webkit-font-smoothing:antialiased}
+.wrap{max-width:760px;margin:0 auto;padding:0 20px}
+.wide{max-width:1060px;margin:0 auto;padding:0 20px}
+h1,h2,h3{font-family:"Archivo",sans-serif;text-wrap:balance;line-height:1.08;margin:0}
+h1{font-size:clamp(2.1rem,5.4vw,3.3rem);font-weight:800;letter-spacing:-0.02em}
+h2{font-size:1.75rem;font-weight:700;letter-spacing:-0.01em;margin:0 0 .5rem}
+h3{font-size:1.12rem;font-weight:700;margin:0 0 .3rem}
+p{margin:0 0 1.05rem}
+a{color:var(--agg);text-decoration:none;border-bottom:1px solid color-mix(in srgb,var(--agg) 35%,transparent)}
+.mono{font-family:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace}
+code{font-family:"IBM Plex Mono",monospace;font-size:.86em;background:var(--panel2);
+  padding:.1em .38em;border-radius:4px;border:1px solid var(--line)}
+.eyebrow{font-family:"IBM Plex Mono",monospace;font-size:.75rem;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--muted)}
+header.hero{padding:4rem 0 1.5rem}
+.thesis{font-size:1.32rem;line-height:1.4;color:var(--ink);margin:1.1rem 0 1.6rem;text-wrap:balance;font-weight:500}
+.meta{display:flex;flex-wrap:wrap;gap:.4rem 1.6rem;font-size:.83rem;color:var(--muted);
+  border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:.75rem 0}
+.meta b{color:var(--ink);font-weight:600}
+section{padding:2.4rem 0}
+.snum{font-family:"IBM Plex Mono",monospace;color:var(--muted);font-size:.8rem;
+  letter-spacing:.1em;font-weight:600;display:block;margin-bottom:.35rem}
+/* key findings cards */
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;margin:1.2rem 0}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:1rem 1.1rem;border-top:3px solid var(--k,var(--agg))}
+.card .big{font-family:"Archivo",sans-serif;font-weight:800;font-size:1.9rem;letter-spacing:-0.02em;
+  color:var(--k,var(--agg));font-variant-numeric:tabular-nums;line-height:1}
+.card .lbl{font-size:.9rem;color:var(--muted);margin-top:.35rem;line-height:1.35}
+/* chart panel */
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:1.1rem 1.15rem 1rem;margin:1.1rem 0}
+.panel .ptitle{font-family:"Archivo",sans-serif;font-weight:700;font-size:1.02rem}
+.panel .psub{font-size:.85rem;color:var(--muted);margin:.15rem 0 .5rem}
+.panel .take{font-size:.92rem;margin-top:.7rem;padding-top:.7rem;border-top:1px dashed var(--line);color:var(--ink)}
+.panel .take b{color:var(--k,var(--ink))}
+.chartgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media (max-width:820px){.chartgrid{grid-template-columns:1fr}}
+.legend{display:flex;flex-wrap:wrap;gap:.4rem 1rem;font-size:.78rem;color:var(--muted);margin:.1rem 0 .4rem}
+.legend i{display:inline-block;width:22px;height:0;border-top:3px solid var(--c);vertical-align:middle;margin-right:5px;border-radius:2px}
+.legend .dot{width:9px;height:9px;border-top:0;background:var(--c);border-radius:2px}
+svg.chart{width:100%;height:auto;display:block;font-family:"IBM Plex Mono",monospace}
+svg.chart text{fill:var(--muted)}
+.gridline{stroke:var(--grid);stroke-width:1}
+.axis{stroke:var(--line);stroke-width:1.2}
+.s-agg{stroke:var(--agg)} .f-agg{fill:var(--agg)}
+.s-disagg{stroke:var(--disagg)} .f-disagg{fill:var(--disagg)}
+.s-cpu{stroke:var(--cpu)} .f-cpu{fill:var(--cpu)}
+.ln{fill:none;stroke-width:2.4}
+/* tables */
+.tblwrap{overflow-x:auto;margin:1rem 0}
+table{border-collapse:collapse;width:100%;font-size:.9rem;font-variant-numeric:tabular-nums}
+th,td{padding:.55rem .7rem;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:.72rem;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--muted);border-bottom:2px solid var(--line)}
+td.n{text-align:right;font-family:"IBM Plex Mono",monospace}
+.pill{display:inline-block;font-family:"IBM Plex Mono",monospace;font-size:.72rem;font-weight:600;
+  padding:.1em .5em;border-radius:100px;letter-spacing:.02em}
+.pill.win{background:var(--cpu-soft);color:var(--cpu)}
+.pill.lose{background:var(--disagg-soft);color:var(--disagg)}
+.pill.base{background:var(--agg-soft);color:var(--agg)}
+.pill.skip{background:var(--panel2);color:var(--muted)}
+figure{margin:1.2rem 0}
+figure svg{max-width:100%;height:auto;display:block}
+figcaption{font-size:.82rem;color:var(--muted);margin-top:.5rem;line-height:1.45}
+.callout{background:var(--panel2);border:1px solid var(--line);border-left:3px solid var(--k,var(--agg));
+  border-radius:0 8px 8px 0;padding:.85rem 1rem;margin:1.1rem 0;font-size:.94rem}
+.callout .h{font-family:"IBM Plex Mono",monospace;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--k,var(--agg));font-weight:600;margin-bottom:.25rem}
+ul.tight{padding-left:1.15rem;margin:.4rem 0 1rem}ul.tight li{margin-bottom:.4rem}
+hr{border:0;border-top:1px solid var(--line);margin:0}
+.foot{font-size:.83rem;color:var(--muted);padding:2rem 0 4rem}
+pre{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:.9rem 1rem;overflow-x:auto;
+  font-size:.82rem;line-height:1.5;font-family:"IBM Plex Mono",monospace}
+:focus-visible{outline:2px solid var(--agg);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<header class="hero"><div class="wrap">
+  <div class="eyebrow">Prefill / Decode Disaggregation · open-source benchmark</div>
+  <h1>Does Disaggregating Prefill Pay Off?</h1>
+  <p class="thesis">We split LLM prefill from decode across separate engines — GPU→GPU and CPU→GPU — and benchmarked it against ordinary aggregated serving. The short answer: <b>only under specific conditions</b>. On commodity hardware, splitting them usually costs more than it saves.</p>
+  <div class="meta">
+    <span>Models <b>gpt-oss-20b / 120b (MoE), Qwen3-8B</b></span>
+    <span>Hardware <b>H100 80GB · 2× L40S · EPYC 9554</b></span>
+    <span>Stack <b>vLLM 0.28 + NIXL, open-source only</b></span>
+    <span>Code <b><a href="https://github.com/anshubansal2000/Heterogeneous-Prefill-Decode-Disaggregation">github.com/anshubansal2000/…</a></b></span>
+  </div>
+</div></header>
+
+<section><div class="wrap">
+  <span class="snum">SUMMARY</span>
+  <h2>What we found</h2>
+  <p>Prefill and decode have opposite appetites: prefill is a compute-bound burst, decode is a steady, memory-bandwidth-bound trickle. Disaggregation puts each on its own engine so they can scale independently — but the KV cache must then travel between them, and that transfer has a cost. Whether disaggregation wins is a race between the cost of moving KV and the benefit of specialization.</p>
+  <div class="cards">
+    <div class="card" style="--k:var(--agg)">
+      <div class="big">5,150</div>
+      <div class="lbl">output tok/s peak on one H100 (gpt-oss-20b, aggregated) — the baseline scales cleanly to concurrency 32.</div>
+    </div>
+    <div class="card" style="--k:var(--disagg)">
+      <div class="big">5.5×</div>
+      <div class="lbl">worse time-to-first-token when we disaggregated across 2 GPUs with no fast link — the KV transfer overhead dominates.</div>
+    </div>
+    <div class="card" style="--k:var(--cpu)">
+      <div class="big">~100×</div>
+      <div class="lbl">slower to prefill on CPU than GPU for an 8B model — CPU prefill trades away TTFT by 1–2 orders of magnitude.</div>
+    </div>
+    <div class="card" style="--k:var(--ok)">
+      <div class="big">2</div>
+      <div class="lbl">conditions that make disaggregation worth it: a fast interconnect (NVLink/RDMA) <em>and</em> high enough load to hide the transfer.</div>
+    </div>
+  </div>
+</div></section>
+
+<hr class="wrap" style="max-width:760px">
+
+<section><div class="wrap">
+  <span class="snum">SETUP</span>
+  <h2>Five configurations, one harness</h2>
+  <p>We built a self-contained benchmark harness (vLLM + an async load generator) that pins input/output length exactly, sweeps concurrency, and records TTFT, inter-token latency (ITL), end-to-end latency, throughput, and goodput. Every configuration runs through the identical harness so the comparisons are honest.</p>
+  <div class="tblwrap"><table>
+    <tr><th>ID</th><th>Configuration</th><th>Prefill</th><th>Decode</th><th>KV path</th><th>Status</th></tr>
+    <tr><td><b>A</b></td><td>Aggregated (baseline)</td><td>GPU</td><td>same GPU</td><td>none (in-place)</td><td><span class="pill base">measured</span></td></tr>
+    <tr><td><b>C</b></td><td>Same-vendor disaggregation</td><td>NVIDIA GPU 0</td><td>NVIDIA GPU 1</td><td>NIXL, host-staged</td><td><span class="pill base">measured</span></td></tr>
+    <tr><td><b>E</b></td><td>CPU prefill → GPU decode</td><td>CPU (EPYC)</td><td>GPU</td><td>DRAM → PCIe</td><td><span class="pill base">measured*</span></td></tr>
+    <tr><td>B</td><td>Aggregated AMD</td><td colspan="2">AMD MI300X</td><td>—</td><td><span class="pill skip">no AMD stock</span></td></tr>
+    <tr><td>D</td><td>Cross-vendor (NVIDIA→AMD)</td><td>NVIDIA</td><td>AMD</td><td>host-staged</td><td><span class="pill skip">no AMD stock</span></td></tr>
+  </table></div>
+  <p style="font-size:.86rem;color:var(--muted)">* Config E was measured by emulation (CPU prefill timed directly, composed with GPU decode) — see the honest limitations at the end. AMD (B, D) was unavailable on our cloud, so the cross-vendor hypothesis stays open.</p>
+</div></section>
+
+<section><div class="wide">
+  <span class="snum">RESULT 01 · BASELINE</span>
+  <h2 style="max-width:760px">Aggregated serving scales cleanly</h2>
+  <p class="wrap" style="padding:0;max-width:760px">Before judging disaggregation we need the reference. On a single H100, gpt-oss-20b throughput rises almost linearly with concurrency while inter-token latency stays low — this is the number every split has to beat. The prefill-heavy signal is visible too: at 8K input, time-to-first-token climbs steeply with load.</p>
+  <div class="chartgrid">
+    <div class="panel" style="--k:var(--agg)">
+      <div class="ptitle">Throughput vs concurrency</div>
+      <div class="psub">gpt-oss-20b, aggregated on 1× H100 · output tokens/s</div>
+      <div class="legend" id="lg-a-tps"></div>
+      <div id="c-a-tps"></div>
+      <div class="take"><b>More load = more throughput</b>, up to ~5,150 tok/s at concurrency 32. The GPU is not saturated until high concurrency.</div>
+    </div>
+    <div class="panel" style="--k:var(--agg)">
+      <div class="ptitle">Time-to-first-token vs concurrency</div>
+      <div class="psub">gpt-oss-20b, aggregated · TTFT p95 (seconds)</div>
+      <div class="legend" id="lg-a-ttft"></div>
+      <div id="c-a-ttft"></div>
+      <div class="take"><b>Prefill is the pressure point.</b> At 8K input, TTFT climbs to ~4 s under load; short 1K prompts stay well under 1 s.</div>
+    </div>
+  </div>
+  <div class="panel wrap" style="--k:var(--agg);max-width:760px">
+    <div class="ptitle">The bigger MoE costs throughput but not memory</div>
+    <div class="psub">gpt-oss-120b (~63 GB, 5.1B active) also fits one 80 GB GPU — output tok/s vs the 20b, at 1K/1K</div>
+    <div class="legend" id="lg-ab"></div>
+    <div id="c-ab"></div>
+    <div class="take">The 120b activates only 5.1B params/token, so it runs on a single GPU — but is <b>~1.8× slower per token</b> than the 20b. Sparsity buys you the memory, not the speed.</div>
+  </div>
+</div></section>
+
+<section><div class="wide">
+  <span class="snum">RESULT 02 · THE MAIN EVENT</span>
+  <h2 style="max-width:760px">Disaggregation lost — because the KV transfer was slow</h2>
+  <p class="wrap" style="padding:0;max-width:760px">We split prefill onto GPU 0 (producer) and decode onto GPU 1 (consumer), wired by NIXL. The catch: our two L40S GPUs were connected only through the host bridge (no NVLink, no direct peer-to-peer), so NIXL fell back to <b>host-staged</b> transfer — GPU → CPU DRAM → GPU. At scale, the decode engine's own logs measured KV transfers averaging <b>~2.4 seconds each</b>. That overhead swamps any benefit.</p>
+  <div class="chartgrid">
+    <div class="panel" style="--k:var(--disagg)">
+      <div class="ptitle">Throughput: aggregated vs disaggregated</div>
+      <div class="psub">gpt-oss-20b, 8K input / 1K output · output tokens/s (higher is better)</div>
+      <div class="legend" id="lg-ac-tps"></div>
+      <div id="c-ac-tps"></div>
+      <div class="take"><b>Aggregated wins at every point.</b> Disaggregation delivers roughly a third of the throughput — each request pays the transfer tax.</div>
+    </div>
+    <div class="panel" style="--k:var(--disagg)">
+      <div class="ptitle">Time-to-first-token: aggregated vs disaggregated</div>
+      <div class="psub">gpt-oss-20b, 8K input / 1K output · TTFT p95 (seconds, lower is better)</div>
+      <div class="legend" id="lg-ac-ttft"></div>
+      <div id="c-ac-ttft"></div>
+      <div class="take">At concurrency 16, disaggregated TTFT hits <b>11.3 s vs 2.1 s</b> aggregated — a 5.5× penalty, all of it host-staged KV transfer.</div>
+    </div>
+  </div>
+  <div class="callout wrap" style="--k:var(--disagg);max-width:760px">
+    <div class="h">Why this is the expected result, not a failure</div>
+    The project plan predicted it: single-node disaggregation without a fast fabric <em>flatters</em> aggregated serving. We proved the pipeline works end-to-end (NIXL moved KV GPU-to-GPU and generated correct tokens) <em>and</em> quantified exactly what the transfer costs. This is the control that makes cross-vendor (Config D) interpretable: the benefit has to exceed <b>this</b> overhead to be worth it.
+  </div>
+</div></section>
+
+<section><div class="wide">
+  <span class="snum">RESULT 03 · CPU PREFILL</span>
+  <h2 style="max-width:760px">CPU prefill is ~100× slower than GPU prefill</h2>
+  <p class="wrap" style="padding:0;max-width:760px">The second idea (H2): move prefill off the GPU entirely, onto the CPU, freeing the GPU for pure decode. The appeal is real — the CPU→GPU path skips the network — but prefill is compute-bound, and a CPU has a fraction of a GPU's math throughput. We measured it on a 64-core EPYC 9554 against the same 8B model on an L40S.</p>
+  <div class="chartgrid">
+    <div class="panel wrap" style="--k:var(--cpu);max-width:520px">
+      <div class="ptitle">Prefill throughput — CPU vs GPU</div>
+      <div class="psub">Qwen3-8B · tokens/s prefilled (log scale)</div>
+      <div id="c-cpu"></div>
+      <div class="take"><b>The GPU prefills ~100× faster.</b> That gap is the TTFT you sacrifice by moving prefill to the CPU.</div>
+    </div>
+    <div class="panel" style="--k:var(--cpu)">
+      <div class="ptitle">What CPU prefill is — and isn't — good for</div>
+      <div class="psub">the narrow regime where it can still make sense</div>
+      <ul class="tight" style="margin-top:.5rem">
+        <li><b>Never for TTFT.</b> A latency-sensitive workload (chat, autocomplete) is off the table — a 1K-token prompt that prefills in ~0.03 s on GPU takes seconds on CPU.</li>
+        <li><b>Maybe for goodput-per-GPU-dollar.</b> If the SLO is throughput-only (batch, offline) and the GPU is decode-bound, offloading prefill to otherwise-idle CPU can raise tokens per GPU.</li>
+        <li><b>Only at short input.</b> CPU prefill cost grows with input length; beyond a few hundred tokens it is untenable.</li>
+        <li><b>MoE helps.</b> gpt-oss-120b activates only 5.1B params/token, so on CPU it prefills like a ~5B model, not a 120B — the one case where a "120B on CPU" is not absurd.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="callout wrap" style="--k:var(--warn);max-width:760px">
+    <div class="h">Honest limitation</div>
+    Our CPU numbers were measured with an eager-PyTorch forward pass, and the absolute times were dominated by a filesystem I/O artifact (weights re-read from a network volume each call). We report the <em>relative</em> gap (~100×), which is robust; a precise CPU-prefill ceiling needs the optimized vLLM CPU backend, which we leave as follow-up.
+  </div>
+</div></section>
+
+<section><div class="wrap">
+  <span class="snum">RECOMMENDATIONS</span>
+  <h2>What we advise</h2>
+  <p>The decision isn't "disaggregate or don't" — it's a function of your interconnect, your workload shape, and what you're optimizing for. Here is the guide our data supports.</p>
+  <div class="tblwrap"><table>
+    <tr><th>If your situation is…</th><th>Use</th><th>Because</th></tr>
+    <tr><td>One GPU is enough for the model + load</td><td><b>A · Aggregated</b> <span class="pill base">default</span></td><td>No transfer cost, simplest, and it scales cleanly. The bar everything else must clear.</td></tr>
+    <tr><td>Multi-GPU with <b>NVLink / RDMA</b>, high concurrency, long sequences</td><td><b>C · Disaggregation</b> <span class="pill win">worth it</span></td><td>A fast fabric makes KV transfer cheap, and at high load it overlaps with compute — then independent prefill/decode scaling wins.</td></tr>
+    <tr><td>Multi-GPU with only <b>PCIe / host-bridge</b> links</td><td><b>A · Aggregated</b> <span class="pill lose">don't split</span></td><td>Host-staged KV transfer (~2.4 s/req here) costs more than specialization saves — we measured up to 5.5× worse TTFT.</td></tr>
+    <tr><td>Latency-sensitive (chat, autocomplete)</td><td><b>A · Aggregated</b> <span class="pill lose">avoid E</span></td><td>Any prefill offload — CPU or cross-node — adds first-token latency you can't hide from a user.</td></tr>
+    <tr><td>Throughput-only SLO, GPU is decode-bound, spare CPU</td><td><b>E · CPU prefill</b> <span class="pill win">niche win</span></td><td>Short inputs only. Frees GPU for decode; can raise tokens-per-GPU-dollar when TTFT doesn't matter.</td></tr>
+  </table></div>
+  <div class="callout" style="--k:var(--agg)">
+    <div class="h">The one-line takeaway</div>
+    Disaggregation is an <b>interconnect bet</b>, not a free win. Move the KV cache only when the wire is fast enough that moving it is cheaper than the specialization is worth — otherwise the simplest thing (keep prefill and decode together) is also the fastest.
+  </div>
+</div></section>
+
+<section><div class="wrap">
+  <span class="snum">METHOD</span>
+  <h2>How to reproduce this</h2>
+  <p>Everything is one command against the open-source harness. Results, run manifests (git SHA, vLLM version, GPU/CPU info), and every plot are in the repo.</p>
+  <pre>git clone https://github.com/anshubansal2000/Heterogeneous-Prefill-Decode-Disaggregation
+bash scripts/setup_runpod.sh gpt-oss-20b        # install vLLM + weights
+python run.py --config A --model gpt-oss-20b    # aggregated baseline
+python run.py --config C --model gpt-oss-20b    # NIXL disaggregation (2 GPUs)
+python scripts/cpu_prefill_bench.py --model Qwen/Qwen3-8B   # CPU prefill</pre>
+  <p style="font-size:.9rem;color:var(--muted)">Workload matrix: input/output ∈ {1K, 8K}², concurrency 1–32, output length pinned exactly, prefix caching off to isolate raw compute. Total cloud cost for every run in this report: <b>~$9.60</b> on RunPod (H100 + 2× L40S + EPYC).</p>
+  <p style="font-size:.9rem;color:var(--muted)">Open threads: the cross-vendor path (NVIDIA→AMD, Config D) needs AMD hardware we couldn't source; a precise CPU-prefill ceiling needs the vLLM CPU backend build. Both are natural next steps.</p>
+</div></section>
+
+<hr class="wrap" style="max-width:760px">
+<div class="wrap foot">
+  Built from open-source components (vLLM 0.28, NIXL) on rented GPUs. Based on the Moreh cross-vendor PD-disaggregation report (March 2026); this work reproduces the shape with open tooling and quantifies the transfer cost. All numbers are reproducible from the run manifests in the repository.
+</div>
+
+<script>
+const DATA = {"A20": {"1024/1024": [{"c": 1, "tps": 299.07, "ttft": 0.035, "itl": 3.4, "e2el": 3.424, "good": 0.2921}, {"c": 4, "tps": 959.57, "ttft": 0.703, "itl": 3.9, "e2el": 4.266, "good": 0.9371}, {"c": 8, "tps": 1711.61, "ttft": 0.803, "itl": 4.1, "e2el": 4.784, "good": 1.6715}, {"c": 16, "tps": 2877.5, "ttft": 2.469, "itl": 4.7, "e2el": 5.687, "good": 1.4928}, {"c": 32, "tps": 5023.97, "ttft": 1.248, "itl": 6.2, "e2el": 6.507, "good": 4.9062}], "1024/8192": [{"c": 1, "tps": 296.96, "ttft": 0.036, "itl": 3.5, "e2el": 27.586, "good": 0.0363}, {"c": 4, "tps": 1023.89, "ttft": 0.102, "itl": 4.1, "e2el": 32.003, "good": 0.125}, {"c": 8, "tps": 1938.25, "ttft": 0.163, "itl": 4.5, "e2el": 33.811, "good": 0.2366}, {"c": 16, "tps": 3383.87, "ttft": 0.938, "itl": 5.2, "e2el": 38.732, "good": 0.4131}, {"c": 32, "tps": 5150.18, "ttft": 0.582, "itl": 7.3, "e2el": 50.899, "good": 0.6287}], "8192/1024": [{"c": 1, "tps": 296.73, "ttft": 0.162, "itl": 3.3, "e2el": 3.451, "good": 0.2898}, {"c": 4, "tps": 828.97, "ttft": 0.571, "itl": 4.7, "e2el": 4.934, "good": 0.8095}, {"c": 8, "tps": 1282.4, "ttft": 1.083, "itl": 5.6, "e2el": 6.377, "good": 1.2523}, {"c": 16, "tps": 1945.1, "ttft": 2.051, "itl": 6.7, "e2el": 8.385, "good": 1.7808}, {"c": 32, "tps": 2593.56, "ttft": 3.972, "itl": 9.3, "e2el": 12.534, "good": 1.7809}], "8192/8192": [{"c": 1, "tps": 304.76, "ttft": 0.179, "itl": 3.3, "e2el": 26.88, "good": 0.0372}, {"c": 4, "tps": 918.1, "ttft": 0.56, "itl": 4.6, "e2el": 35.689, "good": 0.1121}, {"c": 8, "tps": 1492.51, "ttft": 1.094, "itl": 5.6, "e2el": 43.902, "good": 0.1822}, {"c": 16, "tps": 2345.87, "ttft": 2.04, "itl": 7.2, "e2el": 55.856, "good": 0.2685}, {"c": 32, "tps": 3378.62, "ttft": 3.959, "itl": 10.1, "e2el": 77.491, "good": 0.29}]}, "A120": {"1024/1024": [{"c": 1, "tps": 207.42, "ttft": 0.068, "itl": 4.9, "e2el": 4.937, "good": 0.2026}, {"c": 4, "tps": 544.99, "ttft": 3.658, "itl": 5.7, "e2el": 7.513, "good": 0.2661}, {"c": 8, "tps": 1246.7, "ttft": 1.518, "itl": 5.8, "e2el": 6.566, "good": 1.2175}, {"c": 16, "tps": 2551.32, "ttft": 0.467, "itl": 6.3, "e2el": 6.414, "good": 2.4915}], "1024/8192": [{"c": 1, "tps": 207.46, "ttft": 0.075, "itl": 5.0, "e2el": 39.488, "good": 0.0253}, {"c": 4, "tps": 704.9, "ttft": 0.168, "itl": 5.9, "e2el": 46.482, "good": 0.086}, {"c": 8, "tps": 1348.17, "ttft": 0.257, "itl": 6.4, "e2el": 48.61, "good": 0.1646}, {"c": 16, "tps": 2423.57, "ttft": 0.457, "itl": 7.4, "e2el": 54.08, "good": 0.2958}], "8192/1024": [{"c": 1, "tps": 196.37, "ttft": 0.246, "itl": 5.0, "e2el": 5.215, "good": 0.1918}, {"c": 4, "tps": 511.48, "ttft": 1.085, "itl": 7.4, "e2el": 7.996, "good": 0.4995}, {"c": 8, "tps": 771.01, "ttft": 1.762, "itl": 9.2, "e2el": 10.612, "good": 0.7529}, {"c": 16, "tps": 1078.11, "ttft": 3.391, "itl": 12.2, "e2el": 15.137, "good": 0.7567}], "8192/8192": [{"c": 1, "tps": 202.02, "ttft": 0.245, "itl": 5.1, "e2el": 40.551, "good": 0.0247}, {"c": 4, "tps": 560.09, "ttft": 0.893, "itl": 7.5, "e2el": 58.495, "good": 0.0684}, {"c": 8, "tps": 896.65, "ttft": 1.77, "itl": 9.2, "e2el": 73.067, "good": 0.1095}, {"c": 16, "tps": 1033.38, "ttft": 6.321, "itl": 12.5, "e2el": 100.464, "good": 0.0394}]}, "C20": {"1024/1024": [{"c": 1, "tps": 152.5, "ttft": 0.167, "itl": 6.5, "e2el": 6.715, "good": 0.1489}, {"c": 4, "tps": 399.22, "ttft": 0.477, "itl": 10.5, "e2el": 10.258, "good": 0.3899}, {"c": 8, "tps": 629.18, "ttft": 0.846, "itl": 13.1, "e2el": 12.943, "good": 0.6144}, {"c": 16, "tps": 1011.74, "ttft": 1.643, "itl": 15.8, "e2el": 16.068, "good": 0.988}], "1024/8192": [{"c": 1, "tps": 151.55, "ttft": 0.174, "itl": 6.8, "e2el": 54.053, "good": 0.0185}, {"c": 4, "tps": 385.19, "ttft": 0.505, "itl": 11.2, "e2el": 84.97, "good": 0.047}, {"c": 8, "tps": 630.64, "ttft": 0.911, "itl": 13.8, "e2el": 103.412, "good": 0.077}, {"c": 16, "tps": 1033.51, "ttft": 1.649, "itl": 17.2, "e2el": 126.435, "good": 0.1262}], "8192/1024": [{"c": 1, "tps": 127.75, "ttft": 1.129, "itl": 6.9, "e2el": 8.016, "good": 0.1248}, {"c": 4, "tps": 289.33, "ttft": 3.304, "itl": 11.8, "e2el": 13.828, "good": 0.0706}, {"c": 8, "tps": 421.8, "ttft": 5.883, "itl": 15.5, "e2el": 17.886, "good": 0.0772}, {"c": 16, "tps": 603.38, "ttft": 11.253, "itl": 19.9, "e2el": 23.561, "good": 0.1289}], "8192/8192": [{"c": 1, "tps": 142.29, "ttft": 1.113, "itl": 7.1, "e2el": 57.571, "good": 0.0174}, {"c": 4, "tps": 347.09, "ttft": 3.164, "itl": 12.0, "e2el": 93.536, "good": 0.0053}, {"c": 8, "tps": 525.93, "ttft": 5.964, "itl": 15.9, "e2el": 124.096, "good": 0.012}, {"c": 16, "tps": 766.4, "ttft": 11.335, "itl": 21.8, "e2el": 169.232, "good": 0.0234}]}};
+const COL = {agg:'agg', disagg:'disagg', cpu:'cpu'};
+function svgEl(t,a){const e=document.createElementNS('http://www.w3.org/2000/svg',t);for(const k in a)e.setAttribute(k,a[k]);return e;}
+function niceTicks(max,n=4){const step=Math.pow(10,Math.floor(Math.log10(max/n)));const err=max/n/step;
+  let s=err>=7.5?10:err>=3.5?5:err>=1.5?2:1;s*=step;const t=[];for(let v=0;v<=max*1.001;v+=s)t.push(v);
+  if(t[t.length-1]<max)t.push(t[t.length-1]+s);return t;}
+function lineChart(id, series, opts){
+  const W=opts.w||460, H=opts.h||280, m={l:52,r:14,t:12,b:34};
+  const xs=opts.xs; // array of x categories (concurrency)
+  const allY=series.flatMap(s=>s.pts.map(p=>p.y));
+  const ymax=Math.max(...allY, opts.ymin||0)*1.08||1;
+  const ticks=niceTicks(ymax); const top=ticks[ticks.length-1];
+  const plotW=W-m.l-m.r, plotH=H-m.t-m.b;
+  const X=i=>m.l+ (xs.length<2?plotW/2 : i/(xs.length-1)*plotW);
+  const Y=v=>m.t+plotH-(v/top)*plotH;
+  const svg=svgEl('svg',{class:'chart',viewBox:`0 0 ${W} ${H}`,role:'img'});
+  ticks.forEach(t=>{const y=Y(t);
+    svg.appendChild(svgEl('line',{class:'gridline',x1:m.l,y1:y,x2:W-m.r,y2:y}));
+    const tx=svgEl('text',{x:m.l-8,y:y+3,'text-anchor':'end','font-size':10});tx.textContent=fmt(t);svg.appendChild(tx);});
+  xs.forEach((x,i)=>{const tx=svgEl('text',{x:X(i),y:H-12,'text-anchor':'middle','font-size':10});tx.textContent=x;svg.appendChild(tx);});
+  svg.appendChild(svgEl('line',{class:'axis',x1:m.l,y1:m.t,x2:m.l,y2:m.t+plotH}));
+  series.forEach(s=>{
+    let d='';s.pts.forEach((p,i)=>{d+=(i?'L':'M')+X(i)+' '+Y(p.y)+' ';});
+    svg.appendChild(svgEl('path',{class:'ln s-'+s.cls,d}));
+    s.pts.forEach((p,i)=>svg.appendChild(svgEl('circle',{class:'f-'+s.cls,cx:X(i),cy:Y(p.y),r:3.4})));
+  });
+  document.getElementById(id).appendChild(svg);
+}
+function fmt(v){return v>=1000?(v/1000)+'k':(Math.round(v*100)/100);}
+function legend(id,items){const el=document.getElementById(id);if(!el)return;
+  el.innerHTML=items.map(it=>`<span><i style="--c:var(--${it.c})"></i>${it.name}</span>`).join('');}
+function barLog(id, bars, opts){
+  const W=opts.w||460,H=opts.h||280,m={l:60,r:16,t:14,b:44};
+  const vals=bars.map(b=>b.v);const lo=Math.pow(10,Math.floor(Math.log10(Math.min(...vals))));
+  const hi=Math.pow(10,Math.ceil(Math.log10(Math.max(...vals))));
+  const plotW=W-m.l-m.r,plotH=H-m.t-m.b;
+  const Y=v=>m.t+plotH-(Math.log10(v)-Math.log10(lo))/(Math.log10(hi)-Math.log10(lo))*plotH;
+  const svg=svgEl('svg',{class:'chart',viewBox:`0 0 ${W} ${H}`,role:'img'});
+  for(let e=Math.log10(lo);e<=Math.log10(hi)+0.001;e++){const v=Math.pow(10,e);const y=Y(v);
+    svg.appendChild(svgEl('line',{class:'gridline',x1:m.l,y1:y,x2:W-m.r,y2:y}));
+    const tx=svgEl('text',{x:m.l-8,y:y+3,'text-anchor':'end','font-size':10});tx.textContent=v>=1000?(v/1000)+'k':v;svg.appendChild(tx);}
+  const bw=plotW/bars.length*0.5;
+  bars.forEach((b,i)=>{const cx=m.l+plotW*(i+0.5)/bars.length;const y=Y(b.v);
+    svg.appendChild(svgEl('rect',{class:'f-'+b.cls,x:cx-bw/2,y:y,width:bw,height:m.t+plotH-y,rx:3}));
+    const t1=svgEl('text',{x:cx,y:y-6,'text-anchor':'middle','font-size':12,'font-weight':600});t1.textContent=b.v>=1000?Math.round(b.v/1000)+'k':Math.round(b.v);t1.setAttribute('fill','var(--ink)');svg.appendChild(t1);
+    b.name.split('\n').forEach((ln,k)=>{const t2=svgEl('text',{x:cx,y:H-26+k*13,'text-anchor':'middle','font-size':10});t2.textContent=ln;svg.appendChild(t2);});
+  });
+  document.getElementById(id).appendChild(svg);
+}
+function draw(){
+  const conc=[1,4,8,16,32], conc4=[1,4,8,16];
+  const wl=['1024/1024','1024/8192','8192/1024','8192/8192'];
+  const nm={'1024/1024':'1K/1K','1024/8192':'1K/8K','8192/1024':'8K/1K','8192/8192':'8K/8K'};
+  const clsFor=k=>k==='1024/1024'?'agg':k==='8192/1024'?'disagg':k==='1024/8192'?'cpu':'agg';
+  // Result 1: A throughput + ttft (all workloads) — use color per workload via inline stroke
+  const wcol={'1024/1024':'#2563EB','1024/8192':'#0D9488','8192/1024':'#C2620C','8192/8192':'#8B5CF6'};
+  function multi(id,key,metric,ymin){
+    const W=460,H=280,m={l:52,r:14,t:12,b:34};const xs=conc;
+    const rows=DATA.A20[Object.keys(DATA.A20)[0]];
+    const series=wl.map(k=>({k,pts:DATA[key][k].map(p=>({x:p.c,y:p[metric]}))}));
+    const allY=series.flatMap(s=>s.pts.map(p=>p.y));const top=niceTicks(Math.max(...allY)*1.08||1);const tk=top[top.length-1];
+    const plotW=W-m.l-m.r,plotH=H-m.t-m.b;
+    const xcat=[...new Set(series.flatMap(s=>s.pts.map(p=>p.x)))].sort((a,b)=>a-b);
+    const X=x=>m.l+xcat.indexOf(x)/(xcat.length-1)*plotW, Y=v=>m.t+plotH-(v/tk)*plotH;
+    const svg=svgEl('svg',{class:'chart',viewBox:`0 0 ${W} ${H}`,role:'img'});
+    top.forEach(t=>{const y=Y(t);svg.appendChild(svgEl('line',{class:'gridline',x1:m.l,y1:y,x2:W-m.r,y2:y}));
+      const tx=svgEl('text',{x:m.l-8,y:y+3,'text-anchor':'end','font-size':10});tx.textContent=fmt(t);svg.appendChild(tx);});
+    xcat.forEach(x=>{const tx=svgEl('text',{x:X(x),y:H-12,'text-anchor':'middle','font-size':10});tx.textContent=x;svg.appendChild(tx);});
+    svg.appendChild(svgEl('line',{class:'axis',x1:m.l,y1:m.t,x2:m.l,y2:m.t+plotH}));
+    series.forEach(s=>{let d='';s.pts.forEach((p,i)=>{d+=(i?'L':'M')+X(p.x)+' '+Y(p.y)+' ';});
+      svg.appendChild(svgEl('path',{class:'ln',d,stroke:wcol[s.k]}));
+      s.pts.forEach(p=>svg.appendChild(svgEl('circle',{cx:X(p.x),cy:Y(p.y),r:3.2,fill:wcol[s.k]})));});
+    document.getElementById(id).appendChild(svg);
+  }
+  const wlLegend=id=>{const el=document.getElementById(id);if(el)el.innerHTML=wl.map(k=>`<span><i style="--c:x;border-top-color:${wcol[k]}"></i>${nm[k]}</span>`).join('');};
+  wlLegend('lg-a-tps');wlLegend('lg-a-ttft');
+  multi('c-a-tps','A20','tps');multi('c-a-ttft','A20','ttft');
+  // 20b vs 120b at 1K/1K
+  legend('lg-ab',[{name:'gpt-oss-20b',c:'agg'},{name:'gpt-oss-120b',c:'disagg'}]);
+  lineChart('c-ab',[
+    {cls:'agg',pts:DATA.A20['1024/1024'].map(p=>({x:p.c,y:p.tps}))},
+    {cls:'disagg',pts:DATA.A120['1024/1024'].map(p=>({x:p.c,y:p.tps}))}
+  ],{xs:[1,4,8,16,32]});
+  // Result 2: A vs C at 8K/1K
+  legend('lg-ac-tps',[{name:'A · aggregated',c:'agg'},{name:'C · disaggregated',c:'disagg'}]);
+  legend('lg-ac-ttft',[{name:'A · aggregated',c:'agg'},{name:'C · disaggregated',c:'disagg'}]);
+  lineChart('c-ac-tps',[
+    {cls:'agg',pts:DATA.A20['8192/1024'].filter(p=>p.c<=16).map(p=>({x:p.c,y:p.tps}))},
+    {cls:'disagg',pts:DATA.C20['8192/1024'].map(p=>({x:p.c,y:p.tps}))}
+  ],{xs:[1,4,8,16]});
+  lineChart('c-ac-ttft',[
+    {cls:'agg',pts:DATA.A20['8192/1024'].filter(p=>p.c<=16).map(p=>({x:p.c,y:p.ttft}))},
+    {cls:'disagg',pts:DATA.C20['8192/1024'].map(p=>({x:p.c,y:p.ttft}))}
+  ],{xs:[1,4,8,16]});
+  // Result 3: CPU vs GPU prefill (log bar)
+  barLog('c-cpu',[
+    {name:'CPU prefill\nEPYC 9554',v:110,cls:'cpu'},
+    {name:'GPU prefill\nL40S',v:10779,cls:'agg'}
+  ],{});
+}
+draw();
+</script>
