@@ -1,7 +1,8 @@
 <meta charset="utf-8">
-<title>Disaggregated Prefill/Decode on CPU and GPU</title>
+<title>Prefill/Decode Disaggregation — Commodity Loss, Frontier-Scale Win</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
 <style>
 :root{
@@ -9,6 +10,7 @@
   --line:#E4E7EC; --grid:#EDEFF2;
   --agg:#2563EB; --agg-soft:#DCE6FD; --disagg:#C2620C; --disagg-soft:#FBEBD8;
   --cpu:#0D9488; --cpu-soft:#D3EEEB; --warn:#DC2626; --ok:#0F9D58;
+  --measure:720px; --figure:1040px; --pad:24px;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --bg:#0E1116; --panel:#161A21; --panel2:#1B2029; --ink:#E7EAF0; --muted:#98A2B3;
@@ -26,45 +28,72 @@
 html{-webkit-text-size-adjust:100%}
 body{margin:0;background:var(--bg);color:var(--ink);
   font-family:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
-  font-size:16.5px;line-height:1.6;-webkit-font-smoothing:antialiased}
-.wrap{max-width:760px;margin:0 auto;padding:0 20px}
-.wide{max-width:1060px;margin:0 auto;padding:0 20px}
-h1,h2,h3{font-family:"Archivo",sans-serif;text-wrap:balance;line-height:1.08;margin:0}
-h1{font-size:clamp(2.1rem,5.4vw,3.3rem);font-weight:800;letter-spacing:-0.02em}
-h2{font-size:1.75rem;font-weight:700;letter-spacing:-0.01em;margin:0 0 .5rem}
-h3{font-size:1.12rem;font-weight:700;margin:0 0 .3rem}
-p{margin:0 0 1.05rem}
-a{color:var(--agg);text-decoration:none;border-bottom:1px solid color-mix(in srgb,var(--agg) 35%,transparent)}
+  font-size:17px;line-height:1.62;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+
+/* ---- one shared left edge for everything ---------------------------------
+   Text lives in a `.measure` column. Wide figures live in a `.figure` column
+   that is centered on the SAME axis, so every left edge lines up. ---------- */
+.measure{max-width:var(--measure);margin-inline:auto;padding-inline:var(--pad)}
+.figure{max-width:var(--figure);margin-inline:auto;padding-inline:var(--pad)}
+.figure > .measure{padding-inline:0}   /* intro text inside a wide section: no double pad */
+
+h1,h2,h3{font-family:"Archivo",sans-serif;text-wrap:balance;margin:0}
+h1{font-size:clamp(2.2rem,5.2vw,3.15rem);font-weight:800;letter-spacing:-0.025em;line-height:1.04}
+h2{font-size:clamp(1.5rem,3vw,1.9rem);font-weight:700;letter-spacing:-0.018em;line-height:1.12;margin:0 0 .55rem}
+h3{font-size:1.12rem;font-weight:700;line-height:1.25;margin:1.6rem 0 .4rem}
+p{margin:0 0 1.1rem}
+strong,b{font-weight:600}
+a{color:var(--agg);text-decoration:none;border-bottom:1px solid color-mix(in srgb,var(--agg) 32%,transparent)}
+a:hover{border-bottom-color:var(--agg)}
+em{font-style:italic}
 .mono{font-family:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace}
-code{font-family:"IBM Plex Mono",monospace;font-size:.86em;background:var(--panel2);
-  padding:.1em .38em;border-radius:4px;border:1px solid var(--line)}
-.eyebrow{font-family:"IBM Plex Mono",monospace;font-size:.75rem;letter-spacing:.16em;
-  text-transform:uppercase;color:var(--muted)}
-header.hero{padding:4rem 0 1.5rem}
-.thesis{font-size:1.32rem;line-height:1.4;color:var(--ink);margin:1.1rem 0 1.6rem;text-wrap:balance;font-weight:500}
-.meta{display:flex;flex-wrap:wrap;gap:.4rem 1.6rem;font-size:.83rem;color:var(--muted);
-  border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:.75rem 0}
+code{font-family:"IBM Plex Mono",monospace;font-size:.85em;background:var(--panel2);
+  padding:.12em .38em;border-radius:4px;border:1px solid var(--line)}
+
+/* ---- header ---- */
+.hero{padding:clamp(3rem,7vw,5.5rem) 0 2.2rem}
+.eyebrow{font-family:"IBM Plex Mono",monospace;font-size:.74rem;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--agg);font-weight:600;margin-bottom:1.1rem}
+.subhead{font-family:"Archivo",sans-serif;font-weight:600;font-size:clamp(1.15rem,2.4vw,1.45rem);
+  line-height:1.3;letter-spacing:-0.01em;color:var(--muted);margin:1rem 0 0;text-wrap:balance}
+.thesis{font-size:1.16rem;line-height:1.5;color:var(--ink);margin:1.5rem 0 1.8rem;text-wrap:pretty}
+.byline{display:flex;flex-wrap:wrap;gap:.35rem .9rem;align-items:center;font-size:.86rem;color:var(--muted);
+  padding-top:1.1rem;border-top:1px solid var(--line)}
+.byline b{color:var(--ink);font-weight:600}
+.byline .sep{color:var(--line)}
+.meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:.7rem 1.6rem;
+  font-size:.86rem;color:var(--muted);margin-top:1.4rem;
+  border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:1rem 0}
+.meta .k{font-family:"IBM Plex Mono",monospace;font-size:.68rem;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--muted);display:block;margin-bottom:.15rem}
 .meta b{color:var(--ink);font-weight:600}
-section{padding:2.4rem 0}
-.snum{font-family:"IBM Plex Mono",monospace;color:var(--muted);font-size:.8rem;
-  letter-spacing:.1em;font-weight:600;display:block;margin-bottom:.35rem}
-/* key findings cards */
-.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;margin:1.2rem 0}
-.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:1rem 1.1rem;border-top:3px solid var(--k,var(--agg))}
-.card .big{font-family:"Archivo",sans-serif;font-weight:800;font-size:1.9rem;letter-spacing:-0.02em;
+
+/* ---- section rhythm ---- */
+section{padding:2.9rem 0}
+.snum{font-family:"IBM Plex Mono",monospace;color:var(--agg);font-size:.76rem;
+  letter-spacing:.13em;font-weight:600;display:block;margin-bottom:.5rem}
+.lede{margin-bottom:1.7rem}
+
+/* ---- key-finding cards ---- */
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px;margin:1.5rem 0 .4rem}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:1.15rem 1.2rem;
+  border-top:3px solid var(--k,var(--agg))}
+.card .big{font-family:"Archivo",sans-serif;font-weight:800;font-size:2rem;letter-spacing:-0.02em;
   color:var(--k,var(--agg));font-variant-numeric:tabular-nums;line-height:1}
-.card .lbl{font-size:.9rem;color:var(--muted);margin-top:.35rem;line-height:1.35}
-/* chart panel */
-.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:1.1rem 1.15rem 1rem;margin:1.1rem 0}
-.panel .ptitle{font-family:"Archivo",sans-serif;font-weight:700;font-size:1.02rem}
-.panel .psub{font-size:.85rem;color:var(--muted);margin:.15rem 0 .5rem}
-.panel .take{font-size:.92rem;margin-top:.7rem;padding-top:.7rem;border-top:1px dashed var(--line);color:var(--ink)}
+.card .lbl{font-size:.9rem;color:var(--muted);margin-top:.45rem;line-height:1.4}
+
+/* ---- chart panels ---- */
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;
+  padding:1.15rem 1.2rem 1.05rem;margin:1.15rem 0}
+.panel .ptitle{font-family:"Archivo",sans-serif;font-weight:700;font-size:1.04rem;line-height:1.25}
+.panel .psub{font-size:.85rem;color:var(--muted);margin:.18rem 0 .6rem}
+.panel .take{font-size:.92rem;margin-top:.8rem;padding-top:.75rem;border-top:1px dashed var(--line);color:var(--ink)}
 .panel .take b{color:var(--k,var(--ink))}
-.chartgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-@media (max-width:820px){.chartgrid{grid-template-columns:1fr}}
-.legend{display:flex;flex-wrap:wrap;gap:.4rem 1rem;font-size:.78rem;color:var(--muted);margin:.1rem 0 .4rem}
-.legend i{display:inline-block;width:22px;height:0;border-top:3px solid var(--c);vertical-align:middle;margin-right:5px;border-radius:2px}
-.legend .dot{width:9px;height:9px;border-top:0;background:var(--c);border-radius:2px}
+.chartgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start}
+@media (max-width:760px){.chartgrid{grid-template-columns:1fr}}
+.legend{display:flex;flex-wrap:wrap;gap:.35rem 1rem;font-size:.78rem;color:var(--muted);margin:.15rem 0 .5rem}
+.legend span{display:inline-flex;align-items:center}
+.legend i{display:inline-block;width:22px;height:0;border-top:3px solid var(--c);margin-right:6px;border-radius:2px}
 svg.chart{width:100%;height:auto;display:block;font-family:"IBM Plex Mono",monospace}
 svg.chart text{fill:var(--muted)}
 .gridline{stroke:var(--grid);stroke-width:1}
@@ -73,48 +102,52 @@ svg.chart text{fill:var(--muted)}
 .s-disagg{stroke:var(--disagg)} .f-disagg{fill:var(--disagg)}
 .s-cpu{stroke:var(--cpu)} .f-cpu{fill:var(--cpu)}
 .ln{fill:none;stroke-width:2.4}
-/* tables */
-.tblwrap{overflow-x:auto;margin:1rem 0}
+
+/* ---- tables ---- */
+.tblwrap{overflow-x:auto;margin:1.2rem 0}
 table{border-collapse:collapse;width:100%;font-size:.9rem;font-variant-numeric:tabular-nums}
-th,td{padding:.55rem .7rem;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
-th{font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:.72rem;letter-spacing:.06em;
-  text-transform:uppercase;color:var(--muted);border-bottom:2px solid var(--line)}
+th,td{padding:.6rem .75rem;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:.7rem;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--muted);border-bottom:1.5px solid var(--line)}
+tr:last-child td{border-bottom:0}
 td.n{text-align:right;font-family:"IBM Plex Mono",monospace}
-.pill{display:inline-block;font-family:"IBM Plex Mono",monospace;font-size:.72rem;font-weight:600;
-  padding:.1em .5em;border-radius:100px;letter-spacing:.02em}
+.pill{display:inline-block;font-family:"IBM Plex Mono",monospace;font-size:.7rem;font-weight:600;
+  padding:.12em .55em;border-radius:100px;letter-spacing:.02em;white-space:nowrap}
 .pill.win{background:var(--cpu-soft);color:var(--cpu)}
 .pill.lose{background:var(--disagg-soft);color:var(--disagg)}
 .pill.base{background:var(--agg-soft);color:var(--agg)}
 .pill.skip{background:var(--panel2);color:var(--muted)}
-figure{margin:1.2rem 0}
-figure svg{max-width:100%;height:auto;display:block}
-figcaption{font-size:.82rem;color:var(--muted);margin-top:.5rem;line-height:1.45}
+.fn{font-size:.85rem;color:var(--muted)}
+
+/* ---- callouts ---- */
 .callout{background:var(--panel2);border:1px solid var(--line);border-left:3px solid var(--k,var(--agg));
-  border-radius:0 8px 8px 0;padding:.85rem 1rem;margin:1.1rem 0;font-size:.94rem}
+  border-radius:0 10px 10px 0;padding:1rem 1.15rem;margin:1.3rem 0;font-size:.95rem;line-height:1.55}
 .callout .h{font-family:"IBM Plex Mono",monospace;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;
-  color:var(--k,var(--agg));font-weight:600;margin-bottom:.25rem}
-ul.tight{padding-left:1.15rem;margin:.4rem 0 1rem}ul.tight li{margin-bottom:.4rem}
+  color:var(--k,var(--agg));font-weight:600;margin-bottom:.35rem}
+ul.tight{padding-left:1.2rem;margin:.5rem 0 1rem}
+ul.tight li{margin-bottom:.5rem}
 hr{border:0;border-top:1px solid var(--line);margin:0}
-.foot{font-size:.83rem;color:var(--muted);padding:2rem 0 4rem}
-pre{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:.9rem 1rem;overflow-x:auto;
-  font-size:.82rem;line-height:1.5;font-family:"IBM Plex Mono",monospace}
+pre{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:1rem 1.1rem;overflow-x:auto;
+  font-size:.82rem;line-height:1.6;font-family:"IBM Plex Mono",monospace;margin:1.2rem 0}
+.foot{font-size:.85rem;color:var(--muted);padding:2.2rem 0 4.5rem;line-height:1.6}
 :focus-visible{outline:2px solid var(--agg);outline-offset:2px}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 
-<header class="hero"><div class="wrap">
-  <div class="eyebrow">Prefill / Decode Disaggregation · open-source benchmark</div>
-  <h1>Does Disaggregating Prefill Pay Off?</h1>
-  <p class="thesis">We split LLM prefill from decode across separate engines — GPU→GPU and CPU→GPU — and benchmarked it against ordinary aggregated serving. The short answer: <b>only under specific conditions</b>. On commodity hardware, splitting them usually costs more than it saves.</p>
+<header class="hero"><div class="measure">
+  <div class="eyebrow">Prefill / Decode Disaggregation · Open-source benchmark</div>
+  <h1>Does Splitting Prefill from Decode Pay Off?</h1>
+  <p class="subhead">A loss on commodity GPUs — but likely a win at frontier-lab scale.</p>
+  <p class="thesis">We split LLM prefill from decode across separate engines — GPU→GPU and CPU→GPU — and benchmarked it against ordinary aggregated serving. On commodity hardware the split usually costs more than it saves. The payoff appears only with a fast interconnect and heavy concurrency — precisely the regime a frontier-scale fleet is built for.</p>
   <div class="meta">
-    <span>Models <b>gpt-oss-20b / 120b (MoE), Qwen3-8B</b></span>
-    <span>Hardware <b>H100 80GB · 2× L40S · EPYC 9554</b></span>
-    <span>Stack <b>vLLM 0.28 + NIXL, open-source only</b></span>
-    <span>Code <b><a href="https://github.com/anshubansal2000/Heterogeneous-Prefill-Decode-Disaggregation">github.com/anshubansal2000/…</a></b></span>
+    <span><span class="k">Models</span><b>gpt-oss-20b / 120b (MoE), Qwen3-8B</b></span>
+    <span><span class="k">Hardware</span><b>H100 80GB · 2× L40S · EPYC 9554</b></span>
+    <span><span class="k">Stack</span><b>vLLM 0.28 + NIXL · open-source only</b></span>
+    <span><span class="k">Code</span><b><a href="https://github.com/anshubansal2000/Heterogeneous-Prefill-Decode-Disaggregation">github.com/anshubansal2000</a></b></span>
   </div>
 </div></header>
 
-<section><div class="wrap">
+<section><div class="measure">
   <span class="snum">SUMMARY</span>
   <h2>What we found</h2>
   <p>Prefill and decode have opposite appetites: prefill is a compute-bound burst, decode is a steady, memory-bandwidth-bound trickle. Disaggregation puts each on its own engine so they can scale independently — but the KV cache must then travel between them, and that transfer has a cost. Whether disaggregation wins is a race between the cost of moving KV and the benefit of specialization.</p>
@@ -138,9 +171,9 @@ pre{background:var(--panel);border:1px solid var(--line);border-radius:8px;paddi
   </div>
 </div></section>
 
-<hr class="wrap" style="max-width:760px">
+<div class="measure"><hr></div>
 
-<section><div class="wrap">
+<section><div class="measure">
   <span class="snum">SETUP</span>
   <h2>Five configurations, one harness</h2>
   <p>We built a self-contained benchmark harness (vLLM + an async load generator) that pins input/output length exactly, sweeps concurrency, and records TTFT, inter-token latency (ITL), end-to-end latency, throughput, and goodput. Every configuration runs through the identical harness so the comparisons are honest.</p>
@@ -152,13 +185,15 @@ pre{background:var(--panel);border:1px solid var(--line);border-radius:8px;paddi
     <tr><td>B</td><td>Aggregated AMD</td><td colspan="2">AMD MI300X</td><td>—</td><td><span class="pill skip">no AMD stock</span></td></tr>
     <tr><td>D</td><td>Cross-vendor (NVIDIA→AMD)</td><td>NVIDIA</td><td>AMD</td><td>host-staged</td><td><span class="pill skip">no AMD stock</span></td></tr>
   </table></div>
-  <p style="font-size:.86rem;color:var(--muted)">* Config E was measured by emulation (CPU prefill timed directly, composed with GPU decode) — see the honest limitations at the end. AMD (B, D) was unavailable on our cloud, so the cross-vendor hypothesis stays open.</p>
+  <p class="fn">* Config E was measured by emulation (CPU prefill timed directly, composed with GPU decode) — see the honest limitations at the end. AMD (B, D) was unavailable on our cloud, so the cross-vendor hypothesis stays open.</p>
 </div></section>
 
-<section><div class="wide">
-  <span class="snum">RESULT 01 · BASELINE</span>
-  <h2 style="max-width:760px">Aggregated serving scales cleanly</h2>
-  <p class="wrap" style="padding:0;max-width:760px">Before judging disaggregation we need the reference. On a single H100, gpt-oss-20b throughput rises almost linearly with concurrency while inter-token latency stays low — this is the number every split has to beat. The prefill-heavy signal is visible too: at 8K input, time-to-first-token climbs steeply with load.</p>
+<section><div class="figure">
+  <div class="lede measure">
+    <span class="snum">RESULT 01 · BASELINE</span>
+    <h2>Aggregated serving scales cleanly</h2>
+    <p>Before judging disaggregation we need the reference. On a single H100, gpt-oss-20b throughput rises almost linearly with concurrency while inter-token latency stays low — this is the number every split has to beat. The prefill-heavy signal is visible too: at 8K input, time-to-first-token climbs steeply with load.</p>
+  </div>
   <div class="chartgrid">
     <div class="panel" style="--k:var(--agg)">
       <div class="ptitle">Throughput vs concurrency</div>
@@ -175,19 +210,21 @@ pre{background:var(--panel);border:1px solid var(--line);border-radius:8px;paddi
       <div class="take"><b>Prefill is the pressure point.</b> At 8K input, TTFT climbs to ~4 s under load; short 1K prompts stay well under 1 s.</div>
     </div>
   </div>
-  <div class="panel wrap" style="--k:var(--agg);max-width:760px">
+  <div class="measure"><div class="panel" style="--k:var(--agg)">
     <div class="ptitle">The bigger MoE costs throughput but not memory</div>
     <div class="psub">gpt-oss-120b (~63 GB, 5.1B active) also fits one 80 GB GPU — output tok/s vs the 20b, at 1K/1K</div>
     <div class="legend" id="lg-ab"></div>
     <div id="c-ab"></div>
     <div class="take">The 120b activates only 5.1B params/token, so it runs on a single GPU — but is <b>~1.8× slower per token</b> than the 20b. Sparsity buys you the memory, not the speed.</div>
-  </div>
+  </div></div>
 </div></section>
 
-<section><div class="wide">
-  <span class="snum">RESULT 02 · THE MAIN EVENT</span>
-  <h2 style="max-width:760px">Disaggregation lost — because the KV transfer was slow</h2>
-  <p class="wrap" style="padding:0;max-width:760px">We split prefill onto GPU 0 (producer) and decode onto GPU 1 (consumer), wired by NIXL. The catch: our two L40S GPUs were connected only through the host bridge (no NVLink, no direct peer-to-peer), so NIXL fell back to <b>host-staged</b> transfer — GPU → CPU DRAM → GPU. At scale, the decode engine's own logs measured KV transfers averaging <b>~2.4 seconds each</b>. That overhead swamps any benefit.</p>
+<section><div class="figure">
+  <div class="lede measure">
+    <span class="snum">RESULT 02 · THE MAIN EVENT</span>
+    <h2>Disaggregation lost — because the KV transfer was slow</h2>
+    <p>We split prefill onto GPU 0 (producer) and decode onto GPU 1 (consumer), wired by NIXL. The catch: our two L40S GPUs were connected only through the host bridge (no NVLink, no direct peer-to-peer), so NIXL fell back to <b>host-staged</b> transfer — GPU → CPU DRAM → GPU. At scale, the decode engine's own logs measured KV transfers averaging <b>~2.4 seconds each</b>. That overhead swamps any benefit.</p>
+  </div>
   <div class="chartgrid">
     <div class="panel" style="--k:var(--disagg)">
       <div class="ptitle">Throughput: aggregated vs disaggregated</div>
@@ -204,18 +241,20 @@ pre{background:var(--panel);border:1px solid var(--line);border-radius:8px;paddi
       <div class="take">At concurrency 16, disaggregated TTFT hits <b>11.3 s vs 2.1 s</b> aggregated — a 5.5× penalty, all of it host-staged KV transfer.</div>
     </div>
   </div>
-  <div class="callout wrap" style="--k:var(--disagg);max-width:760px">
+  <div class="measure"><div class="callout" style="--k:var(--disagg)">
     <div class="h">Why this is the expected result, not a failure</div>
     The project plan predicted it: single-node disaggregation without a fast fabric <em>flatters</em> aggregated serving. We proved the pipeline works end-to-end (NIXL moved KV GPU-to-GPU and generated correct tokens) <em>and</em> quantified exactly what the transfer costs. This is the control that makes cross-vendor (Config D) interpretable: the benefit has to exceed <b>this</b> overhead to be worth it.
-  </div>
+  </div></div>
 </div></section>
 
-<section><div class="wide">
-  <span class="snum">RESULT 03 · CPU PREFILL</span>
-  <h2 style="max-width:760px">CPU prefill is ~100× slower than GPU prefill</h2>
-  <p class="wrap" style="padding:0;max-width:760px">The second idea (H2): move prefill off the GPU entirely, onto the CPU, freeing the GPU for pure decode. The appeal is real — the CPU→GPU path skips the network — but prefill is compute-bound, and a CPU has a fraction of a GPU's math throughput. We measured it on a 64-core EPYC 9554 against the same 8B model on an L40S.</p>
+<section><div class="figure">
+  <div class="lede measure">
+    <span class="snum">RESULT 03 · CPU PREFILL</span>
+    <h2>CPU prefill is ~100× slower than GPU prefill</h2>
+    <p>The second idea (H2): move prefill off the GPU entirely, onto the CPU, freeing the GPU for pure decode. The appeal is real — the CPU→GPU path skips the network — but prefill is compute-bound, and a CPU has a fraction of a GPU's math throughput. We measured it on a 64-core EPYC 9554 against the same 8B model on an L40S.</p>
+  </div>
   <div class="chartgrid">
-    <div class="panel wrap" style="--k:var(--cpu);max-width:520px">
+    <div class="panel" style="--k:var(--cpu)">
       <div class="ptitle">Prefill throughput — CPU vs GPU</div>
       <div class="psub">Qwen3-8B · tokens/s prefilled (log scale)</div>
       <div id="c-cpu"></div>
@@ -232,13 +271,13 @@ pre{background:var(--panel);border:1px solid var(--line);border-radius:8px;paddi
       </ul>
     </div>
   </div>
-  <div class="callout wrap" style="--k:var(--warn);max-width:760px">
+  <div class="measure"><div class="callout" style="--k:var(--warn)">
     <div class="h">Honest limitation</div>
     Our CPU numbers were measured with an eager-PyTorch forward pass, and the absolute times were dominated by a filesystem I/O artifact (weights re-read from a network volume each call). We report the <em>relative</em> gap (~100×), which is robust; a precise CPU-prefill ceiling needs the optimized vLLM CPU backend, which we leave as follow-up.
-  </div>
+  </div></div>
 </div></section>
 
-<section><div class="wrap">
+<section><div class="measure">
   <span class="snum">RECOMMENDATIONS</span>
   <h2>What we advise</h2>
   <p>The decision isn't "disaggregate or don't" — it's a function of your interconnect, your workload shape, and what you're optimizing for. Here is the guide our data supports.</p>
@@ -256,43 +295,37 @@ pre{background:var(--panel);border:1px solid var(--line);border-radius:8px;paddi
   </div>
 </div></section>
 
-<section><div class="wide">
+<section><div class="measure">
   <span class="snum">AT SCALE</span>
-  <h2 style="max-width:760px">Why the big labs disaggregate anyway</h2>
-  <p class="wrap" style="padding:0;max-width:760px">Our headline result — disaggregation <em>lost</em> — sounds like it contradicts how frontier inference is built. It doesn't. Our test is the <b>control case that proves why their infrastructure exists</b>: same mechanism, no fast fabric, so it loses. The value is that it quantifies exactly how much overhead the fabric has to beat. Give the KV cache a fast enough wire and enough concurrency to hide behind, and the sign flips.</p>
+  <h2>Why the big labs disaggregate anyway</h2>
+  <p>Our headline result — disaggregation <em>lost</em> — sounds like it contradicts how frontier inference is built. It doesn't. Our test is the <b>control case that proves why their infrastructure exists</b>: same mechanism, no fast fabric, so it loses. The value is that it quantifies exactly how much overhead the fabric has to beat. Give the KV cache a fast enough wire and enough concurrency to hide behind, and the sign flips.</p>
 
-  <div class="panel" style="--k:var(--agg)">
-    <div class="ptitle">Same mechanism, opposite outcome — what changes is the environment</div>
-    <div class="psub">why disaggregation lost on our bench but wins at fleet scale</div>
-    <div class="tblwrap"><table>
-      <tr><th>Factor</th><th>Our benchmark (it lost)</th><th>Frontier-scale serving (it wins)</th></tr>
-      <tr><td>Interconnect</td><td>PCIe / host bridge — <b>no P2P</b>, ~2.4 s per KV transfer</td><td><b>NVLink/NVSwitch</b> in-node + <b>InfiniBand/RoCE RDMA</b> with GPUDirect between nodes</td></tr>
-      <tr><td>Concurrency</td><td>up to 32 — transfer is on the critical path</td><td>thousands — transfer <b>overlaps compute</b> and disappears under load</td></tr>
-      <tr><td>Fleets</td><td>2 GPUs, fixed roles</td><td>independent <b>prefill and decode pools</b>, autoscaled; P:D ratio tuned to traffic</td></tr>
-      <tr><td>Routing</td><td>round-robin</td><td><b>KV-cache-aware</b> — routes to the node already holding the prompt's prefix</td></tr>
-      <tr><td>KV path</td><td>point-to-point, host-staged</td><td><b>pooled distributed KV store</b> (DRAM/SSD tier) with prefix reuse</td></tr>
-    </table></div>
-    <div class="take"><b>Disaggregation is an interconnect bet.</b> The one thing that flips our result is a fast fabric — everything else is amplification.</div>
-  </div>
+  <div class="tblwrap"><table>
+    <tr><th>Factor</th><th>Our benchmark — it lost</th><th>Frontier-scale serving — it wins</th></tr>
+    <tr><td>Interconnect</td><td>PCIe / host bridge — <b>no P2P</b>, ~2.4 s per KV transfer</td><td><b>NVLink/NVSwitch</b> in-node + <b>InfiniBand/RoCE RDMA</b> with GPUDirect between nodes</td></tr>
+    <tr><td>Concurrency</td><td>up to 32 — transfer is on the critical path</td><td>thousands — transfer <b>overlaps compute</b> and disappears under load</td></tr>
+    <tr><td>Fleets</td><td>2 GPUs, fixed roles</td><td>independent <b>prefill and decode pools</b>, autoscaled; P:D ratio tuned to traffic</td></tr>
+    <tr><td>Routing</td><td>round-robin</td><td><b>KV-cache-aware</b> — routes to the node already holding the prompt's prefix</td></tr>
+    <tr><td>KV path</td><td>point-to-point, host-staged</td><td><b>pooled distributed KV store</b> (DRAM/SSD tier) with prefix reuse</td></tr>
+  </table></div>
+  <p class="fn"><b>Disaggregation is an interconnect bet.</b> The one thing that flips our result is a fast fabric — everything else is amplification.</p>
 
-  <div class="wrap" style="padding:0;max-width:760px">
-    <h3 style="margin-top:1.4rem">What they optimize</h3>
-    <ul class="tight">
-      <li><b>The interconnect, first.</b> KV moves GPU→GPU directly at hundreds of GB/s, so moving it is cheaper than the specialization is worth — the exact condition our host-staged link failed.</li>
-      <li><b>Independent scaling &amp; ratio tuning.</b> Long prompts → add prefill nodes; long generations → add decode nodes. You right-size each phase instead of buying GPUs that idle in one of them.</li>
-      <li><b>Prefix caching + KV-aware routing.</b> Most production prompts share prefixes (system prompts, RAG context, chat history). A router sends each request to the node that already has that KV — often skipping prefill entirely.</li>
-      <li><b>Chunked prefill + continuous batching.</b> Prefill is sliced to interleave with decode so neither phase stalls the pipeline, and the transfer is streamed layer-by-layer while decode starts.</li>
-      <li><b>Hardware specialization.</b> Compute-dense GPUs for prefill, bandwidth-dense GPUs for decode — each phase on the silicon it actually needs.</li>
-    </ul>
-  </div>
+  <h3>What they optimize</h3>
+  <ul class="tight">
+    <li><b>The interconnect, first.</b> KV moves GPU→GPU directly at hundreds of GB/s, so moving it is cheaper than the specialization is worth — the exact condition our host-staged link failed.</li>
+    <li><b>Independent scaling &amp; ratio tuning.</b> Long prompts → add prefill nodes; long generations → add decode nodes. You right-size each phase instead of buying GPUs that idle in one of them.</li>
+    <li><b>Prefix caching + KV-aware routing.</b> Most production prompts share prefixes (system prompts, RAG context, chat history). A router sends each request to the node that already has that KV — often skipping prefill entirely.</li>
+    <li><b>Chunked prefill + continuous batching.</b> Prefill is sliced to interleave with decode so neither phase stalls the pipeline, and the transfer is streamed layer-by-layer while decode starts.</li>
+    <li><b>Hardware specialization.</b> Compute-dense GPUs for prefill, bandwidth-dense GPUs for decode — each phase on the silicon it actually needs.</li>
+  </ul>
 
-  <div class="callout wrap" style="--k:var(--warn);max-width:760px">
+  <div class="callout" style="--k:var(--warn)">
     <div class="h">What's public, and what isn't</div>
     <b>Documented in the open:</b> DeepSeek's inference system and Moonshot AI's <b>Mooncake</b> (a KV-cache-centric <em>disaggregated</em> architecture) both describe production PD-disaggregation; the technique is now standard in vLLM, SGLang, NVIDIA Dynamo, and llm-d. <b>Closed:</b> OpenAI's and Anthropic's serving stacks are not publicly disclosed — so we can't confirm their internals. Given the economics and the shared open-source lineage, it is a reasonable inference that frontier labs run something in this family, but that is an inference, not a claim about their systems.
   </div>
 </div></section>
 
-<section><div class="wrap">
+<section><div class="measure">
   <span class="snum">METHOD</span>
   <h2>How to reproduce this</h2>
   <p>Everything is one command against the open-source harness. Results, run manifests (git SHA, vLLM version, GPU/CPU info), and every plot are in the repo.</p>
@@ -301,12 +334,12 @@ bash scripts/setup_runpod.sh gpt-oss-20b        # install vLLM + weights
 python run.py --config A --model gpt-oss-20b    # aggregated baseline
 python run.py --config C --model gpt-oss-20b    # NIXL disaggregation (2 GPUs)
 python scripts/cpu_prefill_bench.py --model Qwen/Qwen3-8B   # CPU prefill</pre>
-  <p style="font-size:.9rem;color:var(--muted)">Workload matrix: input/output ∈ {1K, 8K}², concurrency 1–32, output length pinned exactly, prefix caching off to isolate raw compute. Total cloud cost for every run in this report: <b>~$9.60</b> on RunPod (H100 + 2× L40S + EPYC).</p>
-  <p style="font-size:.9rem;color:var(--muted)">Open threads: the cross-vendor path (NVIDIA→AMD, Config D) needs AMD hardware we couldn't source; a precise CPU-prefill ceiling needs the vLLM CPU backend build. Both are natural next steps.</p>
+  <p class="fn">Workload matrix: input/output ∈ {1K, 8K}², concurrency 1–32, output length pinned exactly, prefix caching off to isolate raw compute. Total cloud cost for every run in this report: <b>~$9.60</b> on RunPod (H100 + 2× L40S + EPYC).</p>
+  <p class="fn">Open threads: the cross-vendor path (NVIDIA→AMD, Config D) needs AMD hardware we couldn't source; a precise CPU-prefill ceiling needs the vLLM CPU backend build. Both are natural next steps.</p>
 </div></section>
 
-<hr class="wrap" style="max-width:760px">
-<div class="wrap foot">
+<div class="measure"><hr></div>
+<div class="measure foot">
   Built from open-source components (vLLM 0.28, NIXL) on rented GPUs. Based on the Moreh cross-vendor PD-disaggregation report (March 2026); this work reproduces the shape with open tooling and quantifies the transfer cost. All numbers are reproducible from the run manifests in the repository.
 </div>
 
