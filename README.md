@@ -1,5 +1,7 @@
 # Heterogeneous Prefill/Decode Disaggregation — benchmark harness
 
+**📊 Live report → [prefill-decode-disaggregation.vercel.app](https://prefill-decode-disaggregation.vercel.app)** — findings, charts, and recommendations.
+
 Self-contained harness to benchmark **prefill/decode (PD) disaggregation** serving
 against aggregated serving, on open-source components only (vLLM + an OpenAI-style
 load generator). Built for the project plan in
